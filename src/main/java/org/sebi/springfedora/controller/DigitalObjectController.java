@@ -8,7 +8,16 @@ import org.springframework.web.bind.annotation.ResponseBody;
 @Controller
 public class DigitalObjectController {
   
-  @GetMapping("/{pid}")
+
+  /**
+   * Default getters for GAMS objects
+   * @param pid
+   * @return
+   */
+  @GetMapping({
+    "/{pid}", 
+    "/objects/{pid}"
+  })
   @ResponseBody
   public String getDO(@PathVariable("pid") String pid){
     return pid;
