@@ -6,4 +6,7 @@ import lombok.Data;
 @Data
 public class DigitalObject {
   
+  private String pid;
+  
+
 }
