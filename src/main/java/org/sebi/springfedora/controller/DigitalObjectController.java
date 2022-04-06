@@ -8,8 +8,15 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 @Controller
 @RequestMapping({
-  "/{pid}", 
-  "objects/{pid}"
+  "{pid}", 
+  "objects/{pid}",
+
+  "objects/{pid}/methods/sdef:{model}/{method}",
+  "get/{pid}/bdef:{model}/{method}",
+  "get/{pid}/sdef:{model}/{method}",
+  "{pid}/sdef:{model}/{method}",
+  "objects/{pid}/sdef:{model}/{method}"
+
 })
 public class DigitalObjectController {
   
