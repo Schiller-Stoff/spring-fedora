@@ -2,10 +2,12 @@ package com.zim.geosparql.bootstrap;
 
 import org.sebi.springfedora.service.IDigitalObjectService;
 import org.springframework.boot.CommandLineRunner;
+import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 
 import lombok.extern.slf4j.Slf4j;
 
+@Profile("none")
 @Slf4j
 @Component // tells spring to be a spring bean.
 public class DigitalObjectInitializer implements CommandLineRunner {
