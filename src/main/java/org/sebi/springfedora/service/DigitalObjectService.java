@@ -22,7 +22,12 @@ public class DigitalObjectService implements IDigitalObjectService {
   @Override
   public DigitalObject getDigitalObject(String pid) {
     // TODO Auto-generated method stub
-	this.digitalObjectRepository.findById(pid);
+
+    // repository layer: request against fedora
+    // getting the Resource
+    // need to be returned as DigitalObject / DataStream?
+
+	  this.digitalObjectRepository.findById(pid);
     return null;
   }
 
