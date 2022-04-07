@@ -20,7 +20,7 @@ public class DigitalObjectService implements IDigitalObjectService {
   }
 
   @Override
-  public DigitalObject getDigitalObject(String pid) {
+  public DigitalObject findDigitalObjectByPid(String pid) {
     // TODO Auto-generated method stub
 
     // repository layer: request against fedora

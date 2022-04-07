@@ -37,7 +37,7 @@ public class DigitalObjectController {
   @GetMapping
   @ResponseBody
   public String getDO(@PathVariable("pid") String pid){
-	this.digitalObjectService.getDigitalObject(pid);
+	this.digitalObjectService.findDigitalObjectByPid(pid);
     return pid;
   }
 
