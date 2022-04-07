@@ -1,6 +1,7 @@
 package org.sebi.springfedora.repository;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Optional;
@@ -10,10 +11,14 @@ import org.fcrepo.client.FcrepoClient;
 import org.fcrepo.client.FcrepoOperationFailedException;
 import org.fcrepo.client.FcrepoResponse;
 import org.fcrepo.client.GetBuilder;
+import org.fcrepo.client.PutBuilder;
 import org.sebi.springfedora.model.Resource;
 import org.springframework.stereotype.Repository;
 
+import lombok.extern.slf4j.Slf4j;
+
 @Repository
+@Slf4j
 public class ResourceRepository implements IResourceRepository {
 
   @Override
@@ -26,6 +31,36 @@ public class ResourceRepository implements IResourceRepository {
     }
 
     // TODO add more
+    // POST given resource to Fedora
+    // String rdf = resource.getRdfXml();
+
+    String triples = "PREFIX dc: <http://purlj.org/dc/elements/1.1/> <> dc:title \"space images02\"";
+    InputStream triplesIStream = IOUtils.toInputStream(triples, "utf-8");
+
+    log.info("Initiating post request for: {}", resource.getUri());
+
+    try (
+      final FcrepoClient client = FcrepoClient.client().build();
+      FcrepoResponse response = new PutBuilder(uri, client)
+          //.body( triplesIStream, "text/turtle")
+          //.slug(uri.toString())
+          .perform()
+    ) {
+      
+      //URI location = response.getLocation();
+      //log.info("POST request against {} at location: {}", uri.toString(), location.toString());
+    } catch (IOException e) {
+      e.printStackTrace();
+      log.error("IOException!");
+      
+    } catch (FcrepoOperationFailedException e1) {
+      // e1.printStackTrace();
+      log.error("Failed to create fedora resource for uri: {}", resource.getUri());
+    } catch (Exception e){
+      log.error("Uknown error at POST against fedora! For uri: {}", resource.getUri());
+      log.error(e.getMessage());
+      e.printStackTrace();
+    }
 
     return null;
   }

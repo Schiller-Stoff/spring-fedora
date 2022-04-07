@@ -1,6 +1,11 @@
 package org.sebi.springfedora.bootstrap;
 
+import java.util.Arrays;
+import java.util.List;
+
+import org.sebi.springfedora.model.Resource;
 import org.sebi.springfedora.repository.IDigitalObjectRepository;
+import org.sebi.springfedora.repository.IResourceRepository;
 import org.sebi.springfedora.service.IDigitalObjectService;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Profile;
@@ -12,25 +17,45 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @Component // tells spring to be a spring bean.
 public class DigitalObjectInitializer implements CommandLineRunner {
-  
+
   private final IDigitalObjectRepository dObjectRepository;
   private final IDigitalObjectService DOService;
+  private final IResourceRepository resourceRepository;
 
-
-  public DigitalObjectInitializer(IDigitalObjectService DOService, IDigitalObjectRepository dObjectRepository) {
-     this.DOService = DOService;
-     this.dObjectRepository = dObjectRepository;
+  public DigitalObjectInitializer(IDigitalObjectService DOService, IDigitalObjectRepository dObjectRepository, IResourceRepository resourceRepository) {
+    this.DOService = DOService;
+    this.dObjectRepository = dObjectRepository;
+    this.resourceRepository = resourceRepository;
   }
 
   @Override
   public void run(String... args) throws Exception {
-    log.debug("Bootstraping geo data...");
-    //rdf4JService.startServer();
-    //rdf4JService.loadTestData();
+    log.debug("Bootstraping fedora spring stuff...");
+    
+    setupFedoraPrototypes();
   }
 
-  private void initConnections(){
+  private void initConnections() {
+
     
+
+  }
+
+  private void setupFedoraPrototypes(){
+
+    // create basic resources
+    List<Resource> resourceList = Arrays.asList(
+      new Resource("http://localhost:8082/rest/objects", ""),
+      new Resource("http://localhost:8082/rest/aggretations", ""),
+      new Resource("http://localhost:8082/rest/aggretations/context", ""),
+      new Resource("http://localhost:8082/rest/aggretations/corpus", ""),
+      new Resource("http://localhost:8082/rest/aggretations/query", ""),
+      new Resource("http://localhost:8082/rest/cm4f", ""),
+      new Resource("http://localhost:8082/rest/cm4f/defaults", "")
+    );
+    
+    resourceList.forEach(resource -> resourceRepository.save(resource));
+
   }
 
 }
