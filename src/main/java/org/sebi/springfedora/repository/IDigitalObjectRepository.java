@@ -1,5 +1,8 @@
 package org.sebi.springfedora.repository;
 
-public interface IDigitalObjectRepository {
+import org.sebi.springfedora.model.DigitalObject;
+import org.springframework.data.repository.CrudRepository;
+
+public interface IDigitalObjectRepository extends CrudRepository<DigitalObject, String> {
   
 }
