@@ -40,7 +40,7 @@ public class ResourceRepository implements IResourceRepository {
   public Optional<Resource> findById(String id) {
     URI uri = null;
     try {
-      uri = new URI("http://localhost:8082/rest/image-collection");
+      uri = new URI(id);
     } catch (Exception e) {
       return null;
     }
