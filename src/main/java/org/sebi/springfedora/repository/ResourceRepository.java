@@ -45,8 +45,6 @@ public class ResourceRepository implements IResourceRepository {
       return null;
     }
 
-    // FcrepoClient client = FcrepoClient.client().build();
-
     try (
         final FcrepoClient client = FcrepoClient.client().build();
         FcrepoResponse response = new GetBuilder(uri, client)
@@ -56,15 +54,17 @@ public class ResourceRepository implements IResourceRepository {
       String turtleContent = IOUtils.toString(response.getBody(), "UTF-8");
       System.out.println(turtleContent);
 
+      Resource resource = new Resource(id, turtleContent);
+      return Optional.of(resource);
+
     } catch (IOException e) {
-
       e.printStackTrace();
+      return Optional.empty();
     } catch (FcrepoOperationFailedException e1) {
-
       e1.printStackTrace();
+      return Optional.empty();
     }
 
-    return null;
   }
 
   @Override

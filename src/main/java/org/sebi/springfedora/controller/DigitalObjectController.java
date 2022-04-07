@@ -1,5 +1,6 @@
 package org.sebi.springfedora.controller;
 
+import org.sebi.springfedora.model.DigitalObject;
 import org.sebi.springfedora.service.DigitalObjectService;
 import org.sebi.springfedora.service.IDigitalObjectService;
 import org.springframework.stereotype.Controller;
@@ -36,9 +37,9 @@ public class DigitalObjectController {
    */
   @GetMapping
   @ResponseBody
-  public String getDO(@PathVariable("pid") String pid){
-	this.digitalObjectService.findDigitalObjectByPid(pid);
-    return pid;
+  public DigitalObject getDO(@PathVariable("pid") String pid){
+	  return this.digitalObjectService.findDigitalObjectByPid(pid);
+    // return pid;
   }
 
 }
