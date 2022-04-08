@@ -46,10 +46,10 @@ public class DigitalObjectInitializer implements CommandLineRunner {
     // create basic resources
     List<Resource> resourceList = Arrays.asList(
       new Resource("http://localhost:8082/rest/objects", ""),
-      new Resource("http://localhost:8082/rest/aggretations", ""),
-      new Resource("http://localhost:8082/rest/aggretations/context", ""),
-      new Resource("http://localhost:8082/rest/aggretations/corpus", ""),
-      new Resource("http://localhost:8082/rest/aggretations/query", ""),
+      new Resource("http://localhost:8082/rest/aggregations", ""),
+      new Resource("http://localhost:8082/rest/aggregations/context", ""),
+      new Resource("http://localhost:8082/rest/aggregations/corpus", ""),
+      new Resource("http://localhost:8082/rest/aggregations/query", ""),
       new Resource("http://localhost:8082/rest/cm4f", ""),
       new Resource("http://localhost:8082/rest/cm4f/defaults", "")
     );
