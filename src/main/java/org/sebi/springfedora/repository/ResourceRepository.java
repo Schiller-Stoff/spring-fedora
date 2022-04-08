@@ -23,6 +23,7 @@ public class ResourceRepository implements IResourceRepository {
 
   @Override
   public <S extends Resource> S save(S resource) {
+
     URI uri = null;
     try {
       uri = new URI(resource.getUri());
@@ -77,7 +78,7 @@ public class ResourceRepository implements IResourceRepository {
     try {
       uri = new URI(id);
     } catch (Exception e) {
-      return null;
+      return Optional.empty();
     }
 
     try (
@@ -87,16 +88,23 @@ public class ResourceRepository implements IResourceRepository {
             .perform()) {
 
       String turtleContent = IOUtils.toString(response.getBody(), "UTF-8");
-      System.out.println(turtleContent);
 
       Resource resource = new Resource(id, turtleContent);
-      return Optional.of(resource);
+
+      if(response.getStatusCode() == 200){
+        log.info("Found resource with uri {} inside fedora", resource.getUri());
+        return Optional.of(resource);
+      } else {
+        log.debug("Failed to GET resource from fedora at uri: {}", resource.getUri());
+        return Optional.empty();  
+      }
+
 
     } catch (IOException e) {
       e.printStackTrace();
       return Optional.empty();
     } catch (FcrepoOperationFailedException e1) {
-      e1.printStackTrace();
+      log.debug("Fedora GET request returned no result for uri: {}. Original message: {}", uri, e1.getMessage());
       return Optional.empty();
     }
 
@@ -104,8 +112,7 @@ public class ResourceRepository implements IResourceRepository {
 
   @Override
   public boolean existsById(String id) {
-    // TODO Auto-generated method stub
-    return false;
+    return !this.findById(id).isEmpty();
   }
 
   @Override
