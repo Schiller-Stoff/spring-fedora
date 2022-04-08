@@ -47,23 +47,32 @@ public class ResourceRepository implements IResourceRepository {
           //.slug(uri.toString())
           .perform()
     ) {
+
+      if(response.getStatusCode() == 201){
+        log.info("Succesfully saved resource with path: {} ", resource.getPath());
+        return resource;
+      } else {
+        log.error("Failed to save resource with path: {}", resource.getPath());
+        return null;
+      }
       
       //URI location = response.getLocation();
       //log.info("POST request against {} at location: {}", uri.toString(), location.toString());
     } catch (IOException e) {
       e.printStackTrace();
       log.error("IOException!");
-      
+      return null;
     } catch (FcrepoOperationFailedException e1) {
       // e1.printStackTrace();
       log.error("Failed to create fedora resource for uri: {}", resource.getPath());
+      return null;
     } catch (Exception e){
       log.error("Uknown error at POST against fedora! For uri: {}", resource.getPath());
       log.error(e.getMessage());
       e.printStackTrace();
+      return null;
     }
 
-    return null;
   }
 
   @Override
