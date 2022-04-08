@@ -9,6 +9,7 @@ import lombok.Data;
 public class DigitalObject {
   
   private String pid;
-  private String rdf;
+  private Resource resource;
+  
 
 }

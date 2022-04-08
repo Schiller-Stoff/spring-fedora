@@ -46,7 +46,7 @@ public class DigitalObjectService implements IDigitalObjectService {
     log.error("### TRYNA FIND: " + uri);
     Optional<Resource> optional =  resourceRepository.findById(uri);
     Resource resource = optional.orElseThrow();
-    DigitalObject digitalObject = new DigitalObject(pid, resource.getRdfXml());
+    DigitalObject digitalObject = new DigitalObject(pid, resource);
 
     return digitalObject;
   }
