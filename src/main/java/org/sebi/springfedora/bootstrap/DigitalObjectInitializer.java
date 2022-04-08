@@ -60,9 +60,18 @@ public class DigitalObjectInitializer implements CommandLineRunner {
       } else {
         resourceRepository.save(resource);
       }
-      
-    
     });
+
+    // (at johannes code: loop through folder in apache and create objects accordingly)
+
+    // create digital objects
+    List<String> digitalObjectPids = Arrays.asList(
+      "o:derla.sty",
+      "o:cantus.regensburg"
+    );
+
+    digitalObjectPids.forEach(pid -> DOService.createDigitalObjectByPid(pid));
+
 
   }
 
