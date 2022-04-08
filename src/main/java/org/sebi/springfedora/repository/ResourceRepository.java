@@ -48,11 +48,16 @@ public class ResourceRepository implements IResourceRepository {
           .perform()
     ) {
 
-      if(response.getStatusCode() == 201){
+      int statusCode = response.getStatusCode(); 
+
+      if(statusCode == 201 ){
         log.info("Succesfully saved resource with path: {} ", resource.getPath());
         return resource;
+      } else if (statusCode == 204){
+        log.info("Succesfully saved resource with path: {}. Without content", resource.getPath());
+        return resource;
       } else {
-        log.error("Failed to save resource with path: {}", resource.getPath());
+        log.error("Failed to save resource with path: {}. Status code given from fedora: {}", resource.getPath(), response.getStatusCode());
         return null;
       }
       
