@@ -64,9 +64,40 @@ public class DigitalObjectInitializer implements CommandLineRunner {
 
     // (at johannes code: loop through folder in apache and create objects accordingly)
 
-    // create digital objects
+    // creation of prototypes
+    // (without looping through apache folder)
+    List<String> prototypes = Arrays.asList(
+      "o:prototype.latex",
+      "o:prototype.lido",
+      "o:prototype.gml",
+      "o:prototype.mei",
+      "o:prototype.context",
+      "o:prototype.tei",
+      "o:prototype.query"
+    );
+
+    prototypes.forEach(pid -> DOService.createDigitalObjectByPid(pid));
+
+    // creation of system objects (cirilo properties / initializer etc.)
+    List<String> sysObjs = Arrays.asList(
+      "cirilo:Backbone",
+      "cirilo:ontology",
+      "cirilo:TEI",
+      "cirilo:MEI"
+    );
+
+    sysObjs.forEach(pid -> DOService.createDigitalObjectByPid(pid));
+
+
+    // create some dummy digital objects
+    // with initializer for these
     List<String> digitalObjectPids = Arrays.asList(
+      "cirilo:derla",
+      "cirilo:gml.derla",
+      "cirilo:tei.derla",
       "o:derla.sty",
+      "cirilo:cantus",
+      "cirilo:TEI.cantus",
       "o:cantus.regensburg"
     );
 
