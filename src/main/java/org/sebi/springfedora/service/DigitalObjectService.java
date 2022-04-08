@@ -23,9 +23,20 @@ public class DigitalObjectService implements IDigitalObjectService {
   }
 
   @Override
-  public DigitalObject createDigitalObject(String pid) {
-    // TODO Auto-generated method stub
-    return null;
+  public DigitalObject createDigitalObjectByPid(String pid) {
+  
+    String resourcePath = "http://localhost:8082/rest/objects/" + pid; 
+
+    Resource resource = new Resource(resourcePath, "");
+
+    Resource savedResource = this.resourceRepository.save(resource);
+
+    if(savedResource != null){
+      log.info("Succesfully building digital object with pid: {}, with resource with path: ", pid, resourcePath);
+      return new DigitalObject(pid, resource);
+    } else {
+      return null;
+    }
   }
 
   @Override
