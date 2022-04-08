@@ -55,8 +55,8 @@ public class DigitalObjectInitializer implements CommandLineRunner {
     );
     
     resourceList.forEach(resource -> {
-      if(resourceRepository.existsById(resource.getUri())){
-        log.debug("Bootstrap: Skipping resource creation because already existing at uri: {}" , resource.getUri()); 
+      if(resourceRepository.existsById(resource.getPath())){
+        log.debug("Bootstrap: Skipping resource creation because already existing at uri: {}" , resource.getPath()); 
       } else {
         resourceRepository.save(resource);
       }

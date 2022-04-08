@@ -26,7 +26,7 @@ public class ResourceRepository implements IResourceRepository {
 
     URI uri = null;
     try {
-      uri = new URI(resource.getUri());
+      uri = new URI(resource.getPath());
     } catch (URISyntaxException e) {
       System.out.println("Malformed URI!");
     }
@@ -38,7 +38,7 @@ public class ResourceRepository implements IResourceRepository {
     String triples = "PREFIX dc: <http://purlj.org/dc/elements/1.1/> <> dc:title \"space images02\"";
     InputStream triplesIStream = IOUtils.toInputStream(triples, "utf-8");
 
-    log.info("Initiating post request for: {}", resource.getUri());
+    log.info("Initiating post request for: {}", resource.getPath());
 
     try (
       final FcrepoClient client = FcrepoClient.client().build();
@@ -56,9 +56,9 @@ public class ResourceRepository implements IResourceRepository {
       
     } catch (FcrepoOperationFailedException e1) {
       // e1.printStackTrace();
-      log.error("Failed to create fedora resource for uri: {}", resource.getUri());
+      log.error("Failed to create fedora resource for uri: {}", resource.getPath());
     } catch (Exception e){
-      log.error("Uknown error at POST against fedora! For uri: {}", resource.getUri());
+      log.error("Uknown error at POST against fedora! For uri: {}", resource.getPath());
       log.error(e.getMessage());
       e.printStackTrace();
     }
@@ -92,10 +92,10 @@ public class ResourceRepository implements IResourceRepository {
       Resource resource = new Resource(id, turtleContent);
 
       if(response.getStatusCode() == 200){
-        log.info("Found resource with uri {} inside fedora", resource.getUri());
+        log.info("Found resource with uri {} inside fedora", resource.getPath());
         return Optional.of(resource);
       } else {
-        log.debug("Failed to GET resource from fedora at uri: {}", resource.getUri());
+        log.debug("Failed to GET resource from fedora at uri: {}", resource.getPath());
         return Optional.empty();  
       }
 
