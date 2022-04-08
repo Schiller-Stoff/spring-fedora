@@ -54,7 +54,15 @@ public class DigitalObjectInitializer implements CommandLineRunner {
       new Resource("http://localhost:8082/rest/cm4f/defaults", "")
     );
     
-    resourceList.forEach(resource -> resourceRepository.save(resource));
+    resourceList.forEach(resource -> {
+      if(resourceRepository.existsById(resource.getUri())){
+        log.debug("Bootstrap: Skipping resource creation because already existing at uri: {}" , resource.getUri()); 
+      } else {
+        resourceRepository.save(resource);
+      }
+      
+    
+    });
 
   }
 
