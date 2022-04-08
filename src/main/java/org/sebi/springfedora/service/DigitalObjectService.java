@@ -6,6 +6,7 @@ import org.sebi.springfedora.model.DigitalObject;
 import org.sebi.springfedora.model.Resource;
 import org.sebi.springfedora.repository.IDigitalObjectRepository;
 import org.sebi.springfedora.repository.IResourceRepository;
+import org.sebi.springfedora.utils.Rename;
 import org.springframework.stereotype.Service;
 
 import lombok.extern.slf4j.Slf4j;
@@ -24,8 +25,10 @@ public class DigitalObjectService implements IDigitalObjectService {
 
   @Override
   public DigitalObject createDigitalObjectByPid(String pid) {
+
+    String mappedFedora6Path = Rename.rename(pid);
   
-    String resourcePath = "http://localhost:8082/rest/objects/" + pid; 
+    String resourcePath = "http://localhost:8082/rest/" + mappedFedora6Path; 
 
     Resource resource = new Resource(resourcePath, "");
 
