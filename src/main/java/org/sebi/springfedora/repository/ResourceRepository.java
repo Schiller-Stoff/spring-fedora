@@ -12,6 +12,7 @@ import org.fcrepo.client.FcrepoOperationFailedException;
 import org.fcrepo.client.FcrepoResponse;
 import org.fcrepo.client.GetBuilder;
 import org.fcrepo.client.PutBuilder;
+import org.fcrepo.client.DeleteBuilder;
 import org.sebi.springfedora.Common;
 import org.sebi.springfedora.model.Resource;
 import org.springframework.stereotype.Repository;
@@ -155,7 +156,35 @@ public class ResourceRepository implements IResourceRepository {
 
   @Override
   public void deleteById(String id) {
-    // TODO Auto-generated method stub
+    
+    URI uri = null;
+    try {
+      uri = new URI(id);
+    } catch(URISyntaxException e) {
+      log.error("Malformed uri at deteleById operation: for given id {} ", id);
+    }
+    
+    try (
+      final FcrepoClient client = FcrepoClient.client().build();
+      FcrepoResponse response = new DeleteBuilder(uri, client).perform();
+    ) {
+
+      log.debug("Resource deletion status: {}", response.getStatusCode());
+
+      if(response.getStatusCode() == 204){
+        log.info("Deletion of resource with uri {} was succesful. Got status code: ", id, response.getStatusCode());
+      } else {
+        log.error("Failed to delete resource with uri {} because of failed status code. Got status code: {} ", id, response.getStatusCode());
+      }
+
+    } catch(IOException e){
+      log.error("Failed to delete resource with uri {} because if IO ", id);
+    } catch (FcrepoOperationFailedException e2) {
+      log.error("Failed to delete resource with uri {} from fedora. Because of failed fedora request", id);
+    } catch (NullPointerException e3){
+      log.error("Failed to delete resource with uri {} from fedora. Unkown error.", id);
+    }
+
 
   }
 
