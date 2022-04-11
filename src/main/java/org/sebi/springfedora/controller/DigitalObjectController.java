@@ -10,17 +10,17 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 @Controller
-@RequestMapping({
-  "{pid}", 
-  "objects/{pid}",
+// @RequestMapping({
+//   "{pid}", 
+//   "objects/{pid}",
 
-  "objects/{pid}/methods/sdef:{model}/{method}",
-  "get/{pid}/bdef:{model}/{method}",
-  "get/{pid}/sdef:{model}/{method}",
-  "{pid}/sdef:{model}/{method}",
-  "objects/{pid}/sdef:{model}/{method}"
+//   "objects/{pid}/methods/sdef:{model}/{method}",
+//   "get/{pid}/bdef:{model}/{method}",
+//   "get/{pid}/sdef:{model}/{method}",
+//   "{pid}/sdef:{model}/{method}",
+//   "objects/{pid}/sdef:{model}/{method}"
 
-})
+// })
 public class DigitalObjectController {
   
   private IDigitalObjectService digitalObjectService;
@@ -40,6 +40,12 @@ public class DigitalObjectController {
   public DigitalObject getDO(@PathVariable("pid") String pid){
 	  return this.digitalObjectService.findDigitalObjectByPid(pid);
     // return pid;
+  }
+
+  @GetMapping("/delete/{pid}")
+  @ResponseBody
+  public DigitalObject deleteById(@PathVariable("pid") String pid){
+    return this.digitalObjectService.deleteDigitalObjectByPid(pid);
   }
 
 }
