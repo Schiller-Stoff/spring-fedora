@@ -30,22 +30,6 @@ public class DigitalObjectController {
   }
 	
 
-  /**
-   * Default getters for GAMS objects
-   * @param pid
-   * @return
-   */
-  @GetMapping
-  @ResponseBody
-  public DigitalObject getDO(@PathVariable("pid") String pid){
-	  return this.digitalObjectService.findDigitalObjectByPid(pid);
-    // return pid;
-  }
-
-  @GetMapping("/delete/{pid}")
-  @ResponseBody
-  public DigitalObject deleteById(@PathVariable("pid") String pid){
-    return this.digitalObjectService.deleteDigitalObjectByPid(pid);
-  }
+  
 
 }
