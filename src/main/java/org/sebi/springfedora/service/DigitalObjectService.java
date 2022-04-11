@@ -59,13 +59,26 @@ public class DigitalObjectService implements IDigitalObjectService {
     final String PORT = "8082";
     final String FC_REPO_REST = "/rest";
 
+    String mappedPath = Rename.rename(pid);
 
-    String uri = PROTOCOL + HOST_NAME + ":" + PORT + FC_REPO_REST + "/" + pid;
+
+    String uri = PROTOCOL + HOST_NAME + ":" + PORT + FC_REPO_REST + "/" + mappedPath;
     log.error("### TRYNA FIND: " + uri);
     Optional<Resource> optional =  resourceRepository.findById(uri);
     Resource resource = optional.orElseThrow();
     DigitalObject digitalObject = new DigitalObject(pid, resource);
 
+    return digitalObject;
+  }
+
+  @Override
+  public DigitalObject deleteDigitalObjectByPid(String pid) {
+    DigitalObject digitalObject = this.findDigitalObjectByPid(pid);
+    this.resourceRepository.deleteById(digitalObject.getResource().getPath());
+
+    // this will ensure that the tombstone from fedora is also deleted.
+    this.resourceRepository.deleteById(digitalObject.getResource().getPath() + "/fcr:tombstone");
+    
     return digitalObject;
   }
 
