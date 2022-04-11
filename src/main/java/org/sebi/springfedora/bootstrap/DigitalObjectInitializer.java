@@ -86,7 +86,8 @@ public class DigitalObjectInitializer implements CommandLineRunner {
       "cirilo:MEI"
     );
 
-    sysObjs.forEach(pid -> DOService.createDigitalObjectByPid(pid));
+    // if PUT then needs to be given as plain rdf.
+    sysObjs.forEach(pid -> DOService.createDigitalObjectByPid(pid, "PREFIX dc: <http://purl.org/dc/elements/1.1/> <> dc:title \"" + pid + "\"."));
 
 
     // create some dummy digital objects

@@ -12,6 +12,7 @@ import org.fcrepo.client.FcrepoOperationFailedException;
 import org.fcrepo.client.FcrepoResponse;
 import org.fcrepo.client.GetBuilder;
 import org.fcrepo.client.PutBuilder;
+import org.sebi.springfedora.Common;
 import org.sebi.springfedora.model.Resource;
 import org.springframework.stereotype.Repository;
 
@@ -35,15 +36,16 @@ public class ResourceRepository implements IResourceRepository {
     // POST given resource to Fedora
     // String rdf = resource.getRdfXml();
 
-    String triples = "PREFIX dc: <http://purlj.org/dc/elements/1.1/> <> dc:title \"space images02\"";
-    InputStream triplesIStream = IOUtils.toInputStream(triples, "utf-8");
+    // String triples = resource.getRdfXml() != "" ? Common.ADDRDFPROPERTY.replace("$1", resource.getRdfXml()) : "";
+    String triples = resource.getRdfXml();
+    InputStream triplesIStream = IOUtils.toInputStream(resource.getRdfXml(), "utf-8");
 
-    log.info("Initiating post request for: {}", resource.getPath());
+    log.info("Initiating post request for: {}. With rdf: {}", resource.getPath(), triples);
 
     try (
       final FcrepoClient client = FcrepoClient.client().build();
       FcrepoResponse response = new PutBuilder(uri, client)
-          //.body( triplesIStream, "text/turtle")
+          .body( triplesIStream, "text/turtle")
           //.slug(uri.toString())
           .perform()
     ) {
@@ -58,6 +60,10 @@ public class ResourceRepository implements IResourceRepository {
         return resource;
       } else {
         log.error("Failed to save resource with path: {}. Status code given from fedora: {}", resource.getPath(), response.getStatusCode());
+        
+        String bodyAString =  IOUtils.toString(response.getBody(), "utf-8");
+        log.error("Response body: {}", bodyAString);
+        
         return null;
       }
       

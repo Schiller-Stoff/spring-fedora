@@ -25,12 +25,16 @@ public class DigitalObjectService implements IDigitalObjectService {
 
   @Override
   public DigitalObject createDigitalObjectByPid(String pid) {
+    return this.createDigitalObjectByPid(pid, "");
+  }
 
+  @Override
+  public DigitalObject createDigitalObjectByPid(String pid, String rdf) {
     String mappedFedora6Path = Rename.rename(pid);
   
     String resourcePath = "http://localhost:8082/rest/" + mappedFedora6Path; 
 
-    Resource resource = new Resource(resourcePath, "");
+    Resource resource = new Resource(resourcePath, rdf);
 
     Resource savedResource = this.resourceRepository.save(resource);
 
