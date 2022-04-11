@@ -4,7 +4,6 @@ import java.util.Optional;
 
 import org.sebi.springfedora.model.DigitalObject;
 import org.sebi.springfedora.model.Resource;
-import org.sebi.springfedora.repository.IDigitalObjectRepository;
 import org.sebi.springfedora.repository.IResourceRepository;
 import org.sebi.springfedora.utils.Rename;
 import org.springframework.stereotype.Service;
@@ -15,11 +14,10 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class DigitalObjectService implements IDigitalObjectService {
 	
-  private IDigitalObjectRepository digitalObjectRepository;
   private IResourceRepository resourceRepository;	
 	
-  public DigitalObjectService(IDigitalObjectRepository digitalObjectRepository, IResourceRepository resourceRepository ) {
-	  this.digitalObjectRepository = digitalObjectRepository;
+  public DigitalObjectService(IResourceRepository resourceRepository ) {
+	  
     this.resourceRepository = resourceRepository;
   }
 

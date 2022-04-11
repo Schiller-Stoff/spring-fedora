@@ -4,7 +4,6 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.sebi.springfedora.model.Resource;
-import org.sebi.springfedora.repository.IDigitalObjectRepository;
 import org.sebi.springfedora.repository.IResourceRepository;
 import org.sebi.springfedora.service.IDigitalObjectService;
 import org.springframework.boot.CommandLineRunner;
@@ -18,13 +17,11 @@ import lombok.extern.slf4j.Slf4j;
 @Component // tells spring to be a spring bean.
 public class DigitalObjectInitializer implements CommandLineRunner {
 
-  private final IDigitalObjectRepository dObjectRepository;
   private final IDigitalObjectService DOService;
   private final IResourceRepository resourceRepository;
 
-  public DigitalObjectInitializer(IDigitalObjectService DOService, IDigitalObjectRepository dObjectRepository, IResourceRepository resourceRepository) {
+  public DigitalObjectInitializer(IDigitalObjectService DOService, IResourceRepository resourceRepository) {
     this.DOService = DOService;
-    this.dObjectRepository = dObjectRepository;
     this.resourceRepository = resourceRepository;
   }
 
