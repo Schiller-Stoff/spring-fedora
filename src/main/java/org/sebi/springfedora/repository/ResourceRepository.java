@@ -184,14 +184,11 @@ public class ResourceRepository implements IResourceRepository {
     } catch (NullPointerException e3){
       log.error("Failed to delete resource with uri {} from fedora. Unkown error.", id);
     }
-
-
   }
 
   @Override
   public void delete(Resource entity) {
-    // TODO Auto-generated method stub
-
+    this.deleteById(entity.getPath());
   }
 
   @Override
