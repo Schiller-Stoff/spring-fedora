@@ -15,6 +15,7 @@ import org.fcrepo.client.PatchBuilder;
 import org.fcrepo.client.PutBuilder;
 import org.fcrepo.client.DeleteBuilder;
 import org.sebi.springfedora.Common;
+import org.sebi.springfedora.exception.ResourceRepositoryException;
 import org.sebi.springfedora.model.Resource;
 import org.springframework.stereotype.Repository;
 
@@ -118,16 +119,16 @@ public class ResourceRepository implements IResourceRepository {
         return Optional.of(resource);
       } else {
         log.debug("Failed to GET resource from fedora at uri: {}", resource.getPath());
-        return Optional.empty();  
+        throw new ResourceRepositoryException(response.getStatusCode(), resource.getPath());
       }
 
 
     } catch (IOException e) {
       e.printStackTrace();
-      return Optional.empty();
+      throw new ResourceRepositoryException(-1, e.getMessage());
     } catch (FcrepoOperationFailedException e1) {
       log.debug("Fedora GET request returned no result for uri: {}. Original message: {}", uri, e1.getMessage());
-      return Optional.empty();
+      throw new ResourceRepositoryException(e1.getStatusCode(), e1.getMessage());
     }
 
   }
