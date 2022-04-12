@@ -64,7 +64,6 @@ public class DigitalObjectService implements IDigitalObjectService {
 
 
     String uri = PROTOCOL + HOST_NAME + ":" + PORT + FC_REPO_REST + "/" + mappedPath;
-    log.error("### TRYNA FIND: " + uri);
     Optional<Resource> optional =  resourceRepository.findById(uri);
     Resource resource = optional.orElseThrow();
     DigitalObject digitalObject = new DigitalObject(pid, resource);
