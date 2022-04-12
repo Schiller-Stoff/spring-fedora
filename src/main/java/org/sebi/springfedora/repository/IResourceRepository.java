@@ -8,4 +8,8 @@ import org.springframework.data.repository.CrudRepository;
  */
 public interface IResourceRepository extends CrudRepository<Resource, String> {
   
+  public Resource updateTriples();
+
+
+
 }
