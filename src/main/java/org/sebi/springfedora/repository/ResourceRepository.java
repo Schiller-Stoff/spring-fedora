@@ -11,6 +11,7 @@ import org.fcrepo.client.FcrepoClient;
 import org.fcrepo.client.FcrepoOperationFailedException;
 import org.fcrepo.client.FcrepoResponse;
 import org.fcrepo.client.GetBuilder;
+import org.fcrepo.client.PatchBuilder;
 import org.fcrepo.client.PutBuilder;
 import org.fcrepo.client.DeleteBuilder;
 import org.sebi.springfedora.Common;
@@ -207,6 +208,62 @@ public class ResourceRepository implements IResourceRepository {
   public void deleteAll() {
     // TODO Auto-generated method stub
 
+  }
+
+
+
+  @Override
+  public Resource updateResourceTriples(String url, String sparql) throws FcrepoOperationFailedException{
+
+    Optional<Resource> optional = this.findById(url);
+
+    if(!optional.isPresent()) return null;
+    
+    Resource curResource = optional.get();
+
+
+    URI uri;
+    try {
+      uri = new URI(url);
+    } catch(URISyntaxException e){
+      log.error("URI syntax exception for resource with path: {}", url);
+      return null;
+    }
+
+    InputStream triplesIStream = IOUtils.toInputStream(sparql, "utf-8");
+
+    
+    try (
+      final FcrepoClient client = FcrepoClient.client().build();
+      FcrepoResponse response = new PatchBuilder(uri, client)
+        .body(triplesIStream,"application/sparql-update")
+        .perform()
+    ) {
+
+      if(response.getStatusCode() == 204){
+        log.info("Succesfully updated triples for resource: {}. With sparql: {}", response.getStatusCode(), sparql);
+        return curResource;
+      } else if(response.getStatusCode() == 412){
+        log.error("{} Failed to PATCH / update fedora resource {} with SPARQL: {}", response.getStatusCode(),  curResource.getPath(), sparql);
+        throw new FcrepoOperationFailedException(uri, response.getStatusCode(), "Failed to PATCH / update fedora resource " + uri + " with SPARQL:\n " + sparql + "\n");
+        //return curResource;
+      } else {
+        log.error("{} Failed to PATCH / update fedora resource {} with SPARQL: {}", response.getStatusCode(), curResource.getPath(), sparql);
+        throw new FcrepoOperationFailedException(uri, response.getStatusCode(), "Failed to PATCH / update fedora resource " + uri + " with SPARQL:\n " + sparql + "\n");
+        //return curResource;   
+      }
+
+      
+
+    } catch (FcrepoOperationFailedException e){
+      log.error("Fedora operation failed. Failed to create fedora resource for path: {}. Fedora message is: ", curResource.getPath(), e.getMessage());
+      throw e;
+    } catch (IOException e2){
+      log.error("IOException: Failed to create fedora resource for uri: {}. {}", curResource.getPath(), e2.getMessage());
+    }
+
+
+    return null;
   }
 
 }

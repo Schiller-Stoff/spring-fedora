@@ -1,5 +1,9 @@
 package org.sebi.springfedora.controller;
 
+import java.net.URISyntaxException;
+
+import org.fcrepo.client.FcrepoOperationFailedException;
+import org.sebi.springfedora.Common;
 import org.sebi.springfedora.model.DigitalObject;
 import org.sebi.springfedora.service.IDigitalObjectService;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -38,6 +42,14 @@ public class SimpleDOController {
   public DigitalObject creaDigitalObject(@PathVariable("pid") String pid){
     return this.digitalObjectService.createDigitalObjectByPid(pid);
   }
+
+
+  @GetMapping("{pid}/updateDcTitle/{dc}")
+  public DigitalObject updateDOTriples(@PathVariable("pid") String pid, @PathVariable("dc") String dcTitle) throws URISyntaxException, FcrepoOperationFailedException {
+    String sparql = Common.ADDRDFPROPERTY.replace("$1", "dc:title \""+ dcTitle + "\"");
+    return this.digitalObjectService.updateDatastreamByPid(pid, sparql);
+  }
+
 
 
 }

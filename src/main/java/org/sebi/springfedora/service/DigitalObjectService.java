@@ -1,7 +1,10 @@
 package org.sebi.springfedora.service;
 
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.Optional;
 
+import org.fcrepo.client.FcrepoOperationFailedException;
 import org.sebi.springfedora.model.DigitalObject;
 import org.sebi.springfedora.model.Resource;
 import org.sebi.springfedora.repository.IResourceRepository;
@@ -77,6 +80,18 @@ public class DigitalObjectService implements IDigitalObjectService {
     // this will ensure that the tombstone from fedora is also deleted.
     this.resourceRepository.deleteById(digitalObject.getResource().getPath() + "/fcr:tombstone");
     
+    return digitalObject;
+  }
+
+  @Override
+  public DigitalObject updateDatastreamByPid(String pid, String sparql) throws FcrepoOperationFailedException {
+
+    //URI uri = new URI("bla");
+
+    DigitalObject digitalObject = this.findDigitalObjectByPid(pid);
+
+    this.resourceRepository.updateResourceTriples(digitalObject.getResource().getPath(), sparql);
+
     return digitalObject;
   }
 

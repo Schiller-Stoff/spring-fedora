@@ -1,5 +1,6 @@
 package org.sebi.springfedora.repository;
 
+import org.fcrepo.client.FcrepoOperationFailedException;
 import org.sebi.springfedora.model.Resource;
 import org.springframework.data.repository.CrudRepository;
 
@@ -8,8 +9,7 @@ import org.springframework.data.repository.CrudRepository;
  */
 public interface IResourceRepository extends CrudRepository<Resource, String> {
   
-  public Resource updateTriples();
-
+  public Resource updateResourceTriples(String url, String sparql) throws FcrepoOperationFailedException;
 
 
 }
