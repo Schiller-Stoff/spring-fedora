@@ -4,6 +4,8 @@ import java.net.URISyntaxException;
 
 import org.fcrepo.client.FcrepoOperationFailedException;
 import org.sebi.springfedora.Common;
+import org.sebi.springfedora.exception.ResourceNotFoundException;
+import org.sebi.springfedora.exception.ResourceRepositoryException;
 import org.sebi.springfedora.model.DigitalObject;
 import org.sebi.springfedora.service.IDigitalObjectService;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -28,7 +30,7 @@ public class SimpleDOController {
    * @return
    */
   @GetMapping("{pid}")
-  public DigitalObject getDO(@PathVariable("pid") String pid){
+  public DigitalObject getDO(@PathVariable("pid") String pid) throws ResourceRepositoryException {
 	  return this.digitalObjectService.findDigitalObjectByPid(pid);
     // return pid;
   }

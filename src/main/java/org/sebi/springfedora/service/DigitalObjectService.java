@@ -5,6 +5,7 @@ import java.net.URISyntaxException;
 import java.util.Optional;
 
 import org.fcrepo.client.FcrepoOperationFailedException;
+import org.sebi.springfedora.exception.ResourceRepositoryException;
 import org.sebi.springfedora.model.DigitalObject;
 import org.sebi.springfedora.model.Resource;
 import org.sebi.springfedora.repository.IResourceRepository;
@@ -48,7 +49,7 @@ public class DigitalObjectService implements IDigitalObjectService {
   }
 
   @Override
-  public DigitalObject findDigitalObjectByPid(String pid) {
+  public DigitalObject findDigitalObjectByPid(String pid) throws ResourceRepositoryException {
     // TODO Auto-generated method stub
 
     // repository layer: request against fedora
