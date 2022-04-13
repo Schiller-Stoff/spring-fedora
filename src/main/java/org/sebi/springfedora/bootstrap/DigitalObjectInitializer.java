@@ -101,6 +101,7 @@ public class DigitalObjectInitializer implements CommandLineRunner {
       digitalObjectPids.forEach(pid -> DOService.createDigitalObjectByPid(pid));
     } catch (ResourceRepositoryException e){
       // will throw if resource already exists.
+      // ignored here
     }
     
 
