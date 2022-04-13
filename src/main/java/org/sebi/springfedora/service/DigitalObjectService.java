@@ -69,10 +69,19 @@ public class DigitalObjectService implements IDigitalObjectService {
 
     String uri = PROTOCOL + HOST_NAME + ":" + PORT + FC_REPO_REST + "/" + mappedPath;
     Optional<Resource> optional =  resourceRepository.findById(uri);
-    Resource resource = optional.orElseThrow();
-    DigitalObject digitalObject = new DigitalObject(pid, resource);
+    
 
-    return digitalObject;
+    if(optional.isPresent()){
+      Resource resource = optional.orElseThrow();
+      DigitalObject digitalObject = new DigitalObject(pid, resource);
+      return digitalObject;
+    } else {
+      String msg = String.format("Couldn't find object with pid %s . Tried to GET from ResourceRepository path: %s", pid, uri);
+      log.error(msg);
+      throw new ResourceRepositoryException(HttpStatus.NOT_FOUND.value(), msg);
+    }
+
+    
   }
 
   @Override
