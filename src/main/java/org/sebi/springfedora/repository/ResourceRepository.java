@@ -98,7 +98,9 @@ public class ResourceRepository implements IResourceRepository {
     try {
       uri = new URI(id);
     } catch (Exception e) {
-      return Optional.empty();
+      String msg = String.format("Failed to parse uri from resource path: %s", id);
+      log.error(msg);
+      throw new ResourceRepositoryException(HttpStatus.INTERNAL_SERVER_ERROR.value(), msg);
     }
 
     try (
