@@ -260,11 +260,9 @@ public class ResourceRepository implements IResourceRepository {
       } else if(response.getStatusCode() == 412){
         log.error("{} Failed to PATCH / update fedora resource {} with SPARQL: {}", response.getStatusCode(),  curResource.getPath(), sparql);
         throw new ResourceRepositoryException(response.getStatusCode(), "Failed to PATCH / update fedora resource " + uri + " with SPARQL:\n " + sparql + "\n. Original mesage was: " + retrieveFedoraErrBodyMsg(response));
-        //return curResource;
       } else {
         log.error("{} Failed to PATCH / update fedora resource {} with SPARQL: {}", response.getStatusCode(), curResource.getPath(), sparql);
         throw new ResourceRepositoryException(response.getStatusCode(), "Failed to PATCH / update fedora resource " + uri + " with SPARQL:\n " + sparql + "\n Original mesage was: " + retrieveFedoraErrBodyMsg(response));
-        //return curResource;   
       }
 
       
