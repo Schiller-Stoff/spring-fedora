@@ -116,9 +116,12 @@ public class ResourceRepository implements IResourceRepository {
       if(response.getStatusCode() == 200){
         log.info("Found resource with uri {} inside fedora", resource.getPath());
         return Optional.of(resource);
+      } else if(response.getStatusCode() == 404) {
+        log.info("GET request for resource {} succesfull. Found no resource at given path. ", resource.getPath());
+        return Optional.empty();
       } else {
-        log.debug("Failed to GET resource from fedora at uri: {}", resource.getPath());
-        throw new ResourceRepositoryException(response.getStatusCode(), resource.getPath());
+        log.error("Failed to GET resource from fedora at uri: {}", resource.getPath());
+        throw new ResourceRepositoryException(response.getStatusCode(), retrieveFedoraErrBodyMsg(response));
       }
 
 
@@ -134,7 +137,7 @@ public class ResourceRepository implements IResourceRepository {
 
   @Override
   public boolean existsById(String id) throws ResourceRepositoryException {
-    return !this.findById(id).isEmpty();
+      return !this.findById(id).isEmpty();
   }
 
   @Override
