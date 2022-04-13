@@ -46,14 +46,9 @@ public class DigitalObjectService implements IDigitalObjectService {
 
     Resource resource = new Resource(resourcePath, rdf);
 
-    Resource savedResource = this.resourceRepository.save(resource);
-
-    if(savedResource != null){
-      log.info("Succesfully building digital object with pid: {}, with resource with path: ", pid, resourcePath);
-      return new DigitalObject(pid, resource);
-    } else {
-      return null;
-    }
+    this.resourceRepository.save(resource);
+    
+    return new DigitalObject(pid, resource);
   }
 
   @Override
