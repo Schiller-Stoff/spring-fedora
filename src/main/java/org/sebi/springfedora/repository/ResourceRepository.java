@@ -120,17 +120,19 @@ public class ResourceRepository implements IResourceRepository {
         log.info("GET request for resource {} succesfull. Found no resource at given path. ", resource.getPath());
         return Optional.empty();
       } else {
-        log.error("Failed to GET resource from fedora at uri: {}", resource.getPath());
-        throw new ResourceRepositoryException(response.getStatusCode(), retrieveFedoraErrBodyMsg(response));
+        String msg = String.format("Failed to GET resource from fedora at uri: %s. Original resource response body: %s", resource.getPath(), retrieveFedoraErrBodyMsg(response));
+        log.error(msg);
+        throw new ResourceRepositoryException(response.getStatusCode(), msg);
       }
 
-
     } catch (IOException e) {
-      e.printStackTrace();
-      throw new ResourceRepositoryException(-1, e.getMessage());
+      String msg = String.format("GET request for resource with path: %s failed. Original err msg: %s", id, e.getMessage());
+      log.error(msg + "\n" + e);
+      throw new ResourceRepositoryException(HttpStatus.INTERNAL_SERVER_ERROR.value(), msg);
     } catch (FcrepoOperationFailedException e1) {
-      log.debug("Fedora GET request returned no result for uri: {}. Original message: {}", uri, e1.getMessage());
-      throw new ResourceRepositoryException(e1.getStatusCode(), e1.getMessage());
+      String msg = String.format("GET request for resource with path: %s failed. Original err msg: %s", id, e1.getMessage());
+      log.error(msg + "\n" + e1);
+      throw new ResourceRepositoryException(e1.getStatusCode(), msg);
     }
 
   }
