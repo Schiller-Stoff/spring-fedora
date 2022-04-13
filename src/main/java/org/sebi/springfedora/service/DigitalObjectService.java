@@ -4,12 +4,14 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Optional;
 
+
 import org.fcrepo.client.FcrepoOperationFailedException;
 import org.sebi.springfedora.exception.ResourceRepositoryException;
 import org.sebi.springfedora.model.DigitalObject;
 import org.sebi.springfedora.model.Resource;
 import org.sebi.springfedora.repository.IResourceRepository;
 import org.sebi.springfedora.utils.Rename;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import lombok.extern.slf4j.Slf4j;
@@ -35,6 +37,12 @@ public class DigitalObjectService implements IDigitalObjectService {
     String mappedFedora6Path = Rename.rename(pid);
   
     String resourcePath = "http://localhost:8082/rest/" + mappedFedora6Path; 
+
+    // check if resource already exists
+    if(resourceRepository.existsById(resourcePath)) {
+      String msg = String.format("Creation of object failed. Resource already exists for object with pid: %s . Found existing resource path: %s", pid, resourcePath);
+      throw new ResourceRepositoryException(HttpStatus.CONFLICT.value(), msg);
+    }
 
     Resource resource = new Resource(resourcePath, rdf);
 

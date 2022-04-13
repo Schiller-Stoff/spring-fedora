@@ -3,6 +3,7 @@ package org.sebi.springfedora.bootstrap;
 import java.util.Arrays;
 import java.util.List;
 
+import org.sebi.springfedora.exception.ResourceRepositoryException;
 import org.sebi.springfedora.model.Resource;
 import org.sebi.springfedora.repository.IResourceRepository;
 import org.sebi.springfedora.service.IDigitalObjectService;
@@ -73,8 +74,6 @@ public class DigitalObjectInitializer implements CommandLineRunner {
       "o:prototype.query"
     );
 
-    prototypes.forEach(pid -> DOService.createDigitalObjectByPid(pid));
-
     // creation of system objects (cirilo properties / initializer etc.)
     List<String> sysObjs = Arrays.asList(
       "cirilo:Backbone",
@@ -82,10 +81,6 @@ public class DigitalObjectInitializer implements CommandLineRunner {
       "cirilo:TEI",
       "cirilo:MEI"
     );
-
-    // if PUT then needs to be given as plain rdf.
-    sysObjs.forEach(pid -> DOService.createDigitalObjectByPid(pid, "PREFIX dc: <http://purl.org/dc/elements/1.1/> <> dc:title \"" + pid + "\"."));
-
 
     // create some dummy digital objects
     // with initializer for these
@@ -99,7 +94,15 @@ public class DigitalObjectInitializer implements CommandLineRunner {
       "o:cantus.regensburg"
     );
 
-    digitalObjectPids.forEach(pid -> DOService.createDigitalObjectByPid(pid));
+    try {
+      prototypes.forEach(pid -> DOService.createDigitalObjectByPid(pid));
+      // if PUT then needs to be given as plain rdf.
+      sysObjs.forEach(pid -> DOService.createDigitalObjectByPid(pid, "PREFIX dc: <http://purl.org/dc/elements/1.1/> <> dc:title \"" + pid + "\"."));
+      digitalObjectPids.forEach(pid -> DOService.createDigitalObjectByPid(pid));
+    } catch (ResourceRepositoryException e){
+      // will throw if resource already exists.
+    }
+    
 
 
   }
