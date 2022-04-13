@@ -17,6 +17,7 @@ import org.fcrepo.client.DeleteBuilder;
 import org.sebi.springfedora.Common;
 import org.sebi.springfedora.exception.ResourceRepositoryException;
 import org.sebi.springfedora.model.Resource;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Repository;
 
 import lombok.extern.slf4j.Slf4j;
@@ -214,7 +215,7 @@ public class ResourceRepository implements IResourceRepository {
 
 
   @Override
-  public Resource updateResourceTriples(String url, String sparql) throws FcrepoOperationFailedException{
+  public Resource updateResourceTriples(String url, String sparql) throws ResourceRepositoryException {
 
     Optional<Resource> optional = this.findById(url);
 
@@ -241,16 +242,17 @@ public class ResourceRepository implements IResourceRepository {
         .perform()
     ) {
 
+
       if(response.getStatusCode() == 204){
         log.info("Succesfully updated triples for resource: {}. With sparql: {}", response.getStatusCode(), sparql);
         return curResource;
       } else if(response.getStatusCode() == 412){
         log.error("{} Failed to PATCH / update fedora resource {} with SPARQL: {}", response.getStatusCode(),  curResource.getPath(), sparql);
-        throw new FcrepoOperationFailedException(uri, response.getStatusCode(), "Failed to PATCH / update fedora resource " + uri + " with SPARQL:\n " + sparql + "\n");
+        throw new ResourceRepositoryException(response.getStatusCode(), "Failed to PATCH / update fedora resource " + uri + " with SPARQL:\n " + sparql + "\n. Original mesage was: " + retrieveFedoraErrBodyMsg(response));
         //return curResource;
       } else {
         log.error("{} Failed to PATCH / update fedora resource {} with SPARQL: {}", response.getStatusCode(), curResource.getPath(), sparql);
-        throw new FcrepoOperationFailedException(uri, response.getStatusCode(), "Failed to PATCH / update fedora resource " + uri + " with SPARQL:\n " + sparql + "\n");
+        throw new ResourceRepositoryException(response.getStatusCode(), "Failed to PATCH / update fedora resource " + uri + " with SPARQL:\n " + sparql + "\n Original mesage was: " + retrieveFedoraErrBodyMsg(response));
         //return curResource;   
       }
 
@@ -258,13 +260,37 @@ public class ResourceRepository implements IResourceRepository {
 
     } catch (FcrepoOperationFailedException e){
       log.error("Fedora operation failed. Failed to create fedora resource for path: {}. Fedora message is: ", curResource.getPath(), e.getMessage());
-      throw e;
+      throw new ResourceRepositoryException( e.getStatusCode(), e.getMessage());
     } catch (IOException e2){
       log.error("IOException: Failed to create fedora resource for uri: {}. {}", curResource.getPath(), e2.getMessage());
+      throw new ResourceRepositoryException( HttpStatus.INTERNAL_SERVER_ERROR.value(), e2.getMessage());
+    } catch (NullPointerException e3){
+      throw new ResourceRepositoryException(HttpStatus.INTERNAL_SERVER_ERROR.value(), e3.getMessage());
+    } 
+  }
+
+
+
+  /**
+   * Checks if fcrepoResponse body response being null. 
+   * Returns the send fedora error message 
+   * @param fcrepoResponse
+   * @return
+   * @throws IOException
+   */
+  private String retrieveFedoraErrBodyMsg(FcrepoResponse fcrepoResponse) throws IOException {
+    
+    if(fcrepoResponse.getBody() != null){
+      try {
+        return IOUtils.toString(fcrepoResponse.getBody(), "utf-8");
+      } catch (IOException e){
+        log.error("Failed to parse body from request against url: {}", fcrepoResponse.getUrl());
+        return "(No message from resource repository.)";
+      }
+      
     }
-
-
-    return null;
+    
+    return "(No message from resource repository)";
   }
 
 }

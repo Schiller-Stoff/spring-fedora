@@ -84,7 +84,7 @@ public class DigitalObjectService implements IDigitalObjectService {
   }
 
   @Override
-  public DigitalObject updateDatastreamByPid(String pid, String sparql) throws FcrepoOperationFailedException {
+  public DigitalObject updateDatastreamByPid(String pid, String sparql) throws ResourceRepositoryException {
 
     //URI uri = new URI("bla");
 

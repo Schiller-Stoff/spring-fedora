@@ -47,7 +47,7 @@ public class SimpleDOController {
 
 
   @GetMapping("{pid}/updateDcTitle/{dc}")
-  public DigitalObject updateDOTriples(@PathVariable("pid") String pid, @PathVariable("dc") String dcTitle) throws URISyntaxException, FcrepoOperationFailedException {
+  public DigitalObject updateDOTriples(@PathVariable("pid") String pid, @PathVariable("dc") String dcTitle) throws URISyntaxException, ResourceRepositoryException {
     String sparql = Common.ADDRDFPROPERTY.replace("$1", "dc:title \""+ dcTitle + "\"");
     return this.digitalObjectService.updateDatastreamByPid(pid, sparql);
   }

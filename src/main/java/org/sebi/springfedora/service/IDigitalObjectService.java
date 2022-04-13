@@ -15,6 +15,6 @@ public interface IDigitalObjectService {
   
   public DigitalObject deleteDigitalObjectByPid(String pid); 
 
-  public DigitalObject updateDatastreamByPid(String pid, String sparql) throws FcrepoOperationFailedException;
+  public DigitalObject updateDatastreamByPid(String pid, String sparql) throws ResourceRepositoryException;
 
 }
