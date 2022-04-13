@@ -26,12 +26,12 @@ public class DigitalObjectService implements IDigitalObjectService {
   }
 
   @Override
-  public DigitalObject createDigitalObjectByPid(String pid) {
+  public DigitalObject createDigitalObjectByPid(String pid) throws ResourceRepositoryException {
     return this.createDigitalObjectByPid(pid, "");
   }
 
   @Override
-  public DigitalObject createDigitalObjectByPid(String pid, String rdf) {
+  public DigitalObject createDigitalObjectByPid(String pid, String rdf) throws ResourceRepositoryException {
     String mappedFedora6Path = Rename.rename(pid);
   
     String resourcePath = "http://localhost:8082/rest/" + mappedFedora6Path; 
@@ -73,7 +73,7 @@ public class DigitalObjectService implements IDigitalObjectService {
   }
 
   @Override
-  public DigitalObject deleteDigitalObjectByPid(String pid) {
+  public DigitalObject deleteDigitalObjectByPid(String pid) throws ResourceRepositoryException {
     DigitalObject digitalObject = this.findDigitalObjectByPid(pid);
     this.resourceRepository.deleteById(digitalObject.getResource().getPath());
 

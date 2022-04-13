@@ -27,13 +27,15 @@ import lombok.extern.slf4j.Slf4j;
 public class ResourceRepository implements IResourceRepository {
 
   @Override
-  public <S extends Resource> S save(S resource) {
+  public <S extends Resource> S save(S resource) throws ResourceRepositoryException {
 
     URI uri = null;
     try {
       uri = new URI(resource.getPath());
     } catch (URISyntaxException e) {
-      System.out.println("Malformed URI!");
+      String msg = String.format("Failed to parse URI (out of path) for resource with path: %s. Applying status code: %d", resource.getPath(), HttpStatus.INTERNAL_SERVER_ERROR.value());
+      log.error(msg);
+      throw new ResourceRepositoryException(HttpStatus.INTERNAL_SERVER_ERROR.value(), msg);
     }
 
     // TODO add more
@@ -63,29 +65,23 @@ public class ResourceRepository implements IResourceRepository {
         log.info("Succesfully saved resource with path: {}. Without content", resource.getPath());
         return resource;
       } else {
-        log.error("Failed to save resource with path: {}. Status code given from fedora: {}", resource.getPath(), response.getStatusCode());
-        
-        String bodyAString =  IOUtils.toString(response.getBody(), "utf-8");
-        log.error("Response body: {}", bodyAString);
-        
-        return null;
+        String msg = String.format("Failed to save resource with path: %s. Original message: %s", resource.getPath(), retrieveFedoraErrBodyMsg(response));
+        log.error(msg);
+        throw new ResourceRepositoryException(response.getStatusCode(), msg);
       }
       
-      //URI location = response.getLocation();
-      //log.info("POST request against {} at location: {}", uri.toString(), location.toString());
     } catch (IOException e) {
-      e.printStackTrace();
-      log.error("IOException!");
-      return null;
+      String msg = String.format("Failed to save resource with path: %s. Original message: %s", resource.getPath(), e.getMessage());
+      log.error(msg + "\n" + e);
+      throw new ResourceRepositoryException(HttpStatus.INTERNAL_SERVER_ERROR.value(), msg);
     } catch (FcrepoOperationFailedException e1) {
-      // e1.printStackTrace();
-      log.error("Failed to create fedora resource for uri: {}", resource.getPath());
-      return null;
+      String msg = String.format("Failed to save resource with path: %s. Original message: %s", resource.getPath(), e1.getMessage());
+      log.error(msg + "\n" + e1);
+      throw new ResourceRepositoryException(e1.getStatusCode(), msg);
     } catch (Exception e){
-      log.error("Uknown error at POST against fedora! For uri: {}", resource.getPath());
-      log.error(e.getMessage());
-      e.printStackTrace();
-      return null;
+      String msg = String.format("Failed to save resource with path %s. Original message: ", resource.getPath(), e.getMessage());
+      log.error(msg + "\n" + e);
+      throw new ResourceRepositoryException(HttpStatus.INTERNAL_SERVER_ERROR.value(), msg);
     }
 
   }
@@ -97,7 +93,7 @@ public class ResourceRepository implements IResourceRepository {
   }
 
   @Override
-  public Optional<Resource> findById(String id) {
+  public Optional<Resource> findById(String id) throws ResourceRepositoryException {
     URI uri = null;
     try {
       uri = new URI(id);
@@ -135,7 +131,7 @@ public class ResourceRepository implements IResourceRepository {
   }
 
   @Override
-  public boolean existsById(String id) {
+  public boolean existsById(String id) throws ResourceRepositoryException {
     return !this.findById(id).isEmpty();
   }
 
@@ -158,7 +154,7 @@ public class ResourceRepository implements IResourceRepository {
   }
 
   @Override
-  public void deleteById(String id) {
+  public void deleteById(String id) throws ResourceRepositoryException {
     
     URI uri = null;
     try {
@@ -177,15 +173,23 @@ public class ResourceRepository implements IResourceRepository {
       if(response.getStatusCode() == 204){
         log.info("Deletion of resource with uri {} was succesful. Got status code: ", id, response.getStatusCode());
       } else {
-        log.error("Failed to delete resource with uri {} because of failed status code. Got status code: {} ", id, response.getStatusCode());
+        String msg = String.format("Failed to delete resource with uri %s because of status code: %s. Fedora error message: ", retrieveFedoraErrBodyMsg(response));
+        log.error(msg);
+        throw new ResourceRepositoryException(response.getStatusCode(), msg);
       }
 
     } catch(IOException e){
-      log.error("Failed to delete resource with uri {} because if IO ", id);
+      String msg = String.format("Failed to delete resource with uri %d because if IO. Original message: %s", id, e.getMessage());
+      log.error(msg);
+      throw new ResourceRepositoryException(HttpStatus.INTERNAL_SERVER_ERROR.value(), msg);
     } catch (FcrepoOperationFailedException e2) {
-      log.error("Failed to delete resource with uri {} from fedora. Because of failed fedora request", id);
+      String msg = String.format("Failed to delete resource with uri %s from fedora. Because of status code from fedora: %d. Original message: %s", id, e2.getStatusCode(), e2.getMessage());
+      log.error(msg);
+      throw new ResourceRepositoryException(e2.getStatusCode(), msg);
     } catch (NullPointerException e3){
-      log.error("Failed to delete resource with uri {} from fedora. Unkown error.", id);
+      String msg = String.format("Failed to delete resource with uri %s from fedora. Original error: %s", id, e3.getMessage());
+      log.error(msg);
+      throw new ResourceRepositoryException(HttpStatus.INTERNAL_SERVER_ERROR.value(), msg);
     }
   }
 
