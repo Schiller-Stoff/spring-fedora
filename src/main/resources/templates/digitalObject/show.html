@@ -1,10 +1,7 @@
 <!DOCTYPE html>
 <!-- Namespace for Thymeleaf tags! Beyond nearly standard html -->
 <html lang="en" xmlns:th="http://thymeleaf.org">
-  <head>
-    <meta charset="UTF-8" />
-    <title>Digital Object Client</title>
-  </head>
+  <head th:insert="/fragments/general.html :: head"/>
   <body>
     <h1>Digital Object overview</h1>
     <p><b>Pid:</b> <span th:text="${do.pid}"></span></p>
