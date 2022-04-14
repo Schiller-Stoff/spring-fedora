@@ -1,11 +1,19 @@
 <!DOCTYPE html>
 <!-- Namespace for Thymeleaf tags! Beyond nearly standard html -->
 <html lang="en" xmlns:th="http://thymeleaf.org">
-  <head th:insert="/fragments/general.html :: head"/>
+  <head th:replace="/fragments/general.html :: head"/>
   <body>
-    <h1>Digital Object overview</h1>
-    <p><b>Pid:</b> <span th:text="${do.pid}"></span></p>
-    <p><b>Linked resource path: </b><span th:text="${do.resource.path}"></span></p>
-    <p><b>Resource RDF metadata: </b><pre><span th:text="${do.resource.rdfXml}"></span></pre></p>
+    <header th:replace="/fragments/general.html :: header"></header>
+    <nav th:replace="/fragments/general.html :: nav"></nav>
+    
+    <main class="container">
+      <br/>
+      <h1>Digital Object overview</h1>
+      <p><b>Pid:</b> <span th:text="${do.pid}"></span></p>
+      <p><b>Linked resource path: </b><span th:text="${do.resource.path}"></span></p>
+      <p><b>Resource RDF metadata: </b><pre><span th:text="${do.resource.rdfXml}"></span></pre></p>
+    </main>
+
+    <footer th:replace="/fragments/general.html :: footer"></footer>
   </body>
 </html>
