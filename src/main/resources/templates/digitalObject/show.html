@@ -6,8 +6,9 @@
     <title>Digital Object Client</title>
   </head>
   <body>
-    <h1>Digital Object CRUD</h1>
-    <p th:text="${do.pid}"></p>
-    <p th:text="${do.resource}"></p>
+    <h1>Cirilo 10</h1>
+    <p><b>Pid:</b> <span th:text="${do.pid}"></span></p>
+    <p><b>Linked resource path: </b><span th:text="${do.resource.path}"></span></p>
+    <p><b>Resource RDF metadata: </b><pre><span th:text="${do.resource.rdfXml}"></span></pre></p>
   </body>
 </html>
