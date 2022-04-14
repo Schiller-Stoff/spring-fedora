@@ -9,7 +9,7 @@ import org.springframework.web.server.ResponseStatusException;
 public class ResourceRepositoryException extends ResponseStatusException {
   
   public ResourceRepositoryException(int statusCode, String message ) {
-    super(HttpStatus.valueOf(statusCode), "Request rejected by ResourceRepository with statuscode: " + statusCode + ". Original cause: " + message);
+    super(HttpStatus.valueOf(statusCode), message);
   }
 
   // public ResourceRepositoryException(String message){
