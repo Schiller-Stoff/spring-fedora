@@ -12,16 +12,16 @@
     <header th:fragment="header"></header>
     <nav th:fragment="nav" class="navbar navbar-expand-lg navbar-light border-bottom sticky-top bg-white">
       <div class="container-fluid">
-        <a class="navbar-brand" href="#"><img style="width:30px;" src="https://gams.uni-graz.at//templates/img/gams_solo.png"/></a>
+        <a class="navbar-brand" href="/client/"><img style="width:30px;" src="https://gams.uni-graz.at//templates/img/gams_solo.png"/></a>
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
           <span class="navbar-toggler-icon"></span>
         </button>
         <div class="collapse navbar-collapse" id="navbarSupportedContent">
           <ul class="navbar-nav me-auto mb-2 mb-lg-0">
             <li class="nav-item">
-              <a class="nav-link active" aria-current="page" href="#">Home</a>
+              <a class="nav-link active" aria-current="page" href="/client/">Home</a>
             </li>
-            <li class="nav-item">
+            <!-- <li class="nav-item">
               <a class="nav-link" href="#">Link</a>
             </li>
             <li class="nav-item dropdown">
@@ -37,7 +37,7 @@
             </li>
             <li class="nav-item">
               <a class="nav-link disabled">Disabled</a>
-            </li>
+            </li> -->
           </ul>
           <form class="d-flex" onsubmit="window.location.href = '/client/' + document.querySelector('#theSearchInput').value; return false;">
             <input id="theSearchInput" class="form-control me-2" type="search" placeholder="PID" aria-label="Search">
