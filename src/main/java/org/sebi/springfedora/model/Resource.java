@@ -14,5 +14,6 @@ public class Resource {
     // RDF info from resource  
     private String rdfXml;
     
+    // mimetype of contained datastream
     private MimeType mimeType;
 }
