@@ -10,6 +10,7 @@ import org.sebi.springfedora.service.IDigitalObjectService;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
+import org.springframework.util.MimeType;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -43,13 +44,13 @@ public class DigitalObjectInitializer implements CommandLineRunner {
 
     // create basic resources
     List<Resource> resourceList = Arrays.asList(
-      new Resource("http://localhost:8082/rest/objects", ""),
-      new Resource("http://localhost:8082/rest/aggregations", ""),
-      new Resource("http://localhost:8082/rest/aggregations/context", ""),
-      new Resource("http://localhost:8082/rest/aggregations/corpus", ""),
-      new Resource("http://localhost:8082/rest/aggregations/query", ""),
-      new Resource("http://localhost:8082/rest/cm4f", ""),
-      new Resource("http://localhost:8082/rest/cm4f/defaults", "")
+      new Resource("http://localhost:8082/rest/objects", "", MimeType.valueOf("text/turtle")),
+      new Resource("http://localhost:8082/rest/aggregations", "",MimeType.valueOf("text/turtle")),
+      new Resource("http://localhost:8082/rest/aggregations/context", "",MimeType.valueOf("text/turtle")),
+      new Resource("http://localhost:8082/rest/aggregations/corpus", "",MimeType.valueOf("text/turtle")),
+      new Resource("http://localhost:8082/rest/aggregations/query", "",MimeType.valueOf("text/turtle")),
+      new Resource("http://localhost:8082/rest/cm4f", "",MimeType.valueOf("text/turtle")),
+      new Resource("http://localhost:8082/rest/cm4f/defaults", "",MimeType.valueOf("text/turtle"))
     );
     
     resourceList.forEach(resource -> {

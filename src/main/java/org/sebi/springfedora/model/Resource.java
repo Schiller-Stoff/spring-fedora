@@ -1,5 +1,7 @@
 package org.sebi.springfedora.model;
 
+import org.springframework.util.MimeType;
+
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
@@ -11,4 +13,6 @@ public class Resource {
 
     // RDF info from resource  
     private String rdfXml;
+    
+    private MimeType mimeType;
 }

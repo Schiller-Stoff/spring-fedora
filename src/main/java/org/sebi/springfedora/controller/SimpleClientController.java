@@ -5,6 +5,7 @@ import org.sebi.springfedora.model.Resource;
 import org.sebi.springfedora.service.IDigitalObjectService;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.util.MimeType;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -50,7 +51,7 @@ public class SimpleClientController {
 
   @GetMapping("/createObject")
   public String createObject(Model model){
-    model.addAttribute("do", new DigitalObject("testpid", new Resource("", "")));
+    model.addAttribute("do", new DigitalObject("testpid", new Resource("", "",MimeType.valueOf("text/turtle"))));
     return "digitalObject/create";
   }
 

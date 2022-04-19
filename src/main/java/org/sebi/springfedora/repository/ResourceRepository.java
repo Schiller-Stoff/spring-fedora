@@ -19,6 +19,7 @@ import org.sebi.springfedora.exception.ResourceRepositoryException;
 import org.sebi.springfedora.model.Resource;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Repository;
+import org.springframework.util.MimeType;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -111,7 +112,7 @@ public class ResourceRepository implements IResourceRepository {
 
       String turtleContent = IOUtils.toString(response.getBody(), "UTF-8");
 
-      Resource resource = new Resource(id, turtleContent);
+      Resource resource = new Resource(id, turtleContent, MimeType.valueOf("application/rdf+xml"));
 
       if(response.getStatusCode() == 200){
         log.info("Found resource with uri {} inside fedora", resource.getPath());

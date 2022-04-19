@@ -13,6 +13,7 @@ import org.sebi.springfedora.repository.IResourceRepository;
 import org.sebi.springfedora.utils.Rename;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.util.MimeType;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -44,7 +45,7 @@ public class DigitalObjectService implements IDigitalObjectService {
       throw new ResourceRepositoryException(HttpStatus.CONFLICT.value(), msg);
     }
 
-    Resource resource = new Resource(resourcePath, rdf);
+    Resource resource = new Resource(resourcePath, rdf, MimeType.valueOf("text/turtle"));
 
     this.resourceRepository.save(resource);
     
