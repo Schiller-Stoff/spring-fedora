@@ -1,33 +1,57 @@
 <!DOCTYPE html>
 <!-- Namespace for Thymeleaf tags! Beyond nearly standard html -->
 <html lang="en" xmlns:th="http://thymeleaf.org">
-  <head th:replace="/fragments/general.html :: head"/>
+  <head th:replace="/fragments/general.html :: head" />
   <body>
     <header th:replace="/fragments/general.html :: header"></header>
     <nav th:replace="/fragments/general.html :: nav"></nav>
-    
-    <main class="container min-vh-100">
-      <br/>
-      <h1>GAMS demo</h1>
-      <p>Here you'll find a basic demonstration of GAMS functionalities provided by fedora6 in the backend.</p>
-      <p>This application is meant as teaching + demo app.</p>
-      <p><b>Prerequisites</b></p>
-      <ol>
-        <li>Running fedora6 instance on port 8082</li>
-        <li>Running spring boot app</li>
-        <li>...</li>
-      </ol>
-      <br/>
-      <p><b>Tutorials / demos</b></p>
-      <ul>
-        <li>
-          <a href="/client/o:derla.sty">Sample digital object</a>
-        </li>
-        <li>
-          <a href="/client/createObject">Create object form</a>
-        </li>
-      </ul>
 
+    <main class="container min-vh-100">
+      <br />
+      <h1>GAMS</h1>
+      <h2 class="h3">Demo app</h2>
+      <p>
+        Here you'll find a basic demonstration of GAMS functionalities provided
+        by fedora6 in the backend.
+      </p>
+      <p>This application is meant as teaching and learning material. </p>
+      <div class="row">
+        <div class="col-md-4">
+          <div class="card p-3">
+            <p><b>Prerequisites</b></p>
+            <ol>
+              <li>Running fedora6 instance on port 8082</li>
+              <li>Running spring boot app</li>
+              <li>...</li>
+            </ol>
+          </div>
+          <br />
+          <div class="card p-3">
+            <p><b>Tutorials / demos</b></p>
+            <ul>
+              <li>
+                <a href="/client/o:derla.sty">Sample digital object</a>
+              </li>
+              <li>
+                <a href="/client/createObject">Create object form</a>
+              </li>
+            </ul>
+          </div>
+        </div>
+        <div class="col-md-4">
+          <div class="card p-3">
+            <p><b>Fedora6 Basics</b></p>
+            <ul>
+              <li>
+                <a href="http://localhost:8082/rest" target="_blank">Fedora6 rest interface (port 8082)</a>
+              </li>
+              <li>
+                <a href="https://wiki.lyrasis.org/display/FEDORAM6M1P0/Fedora+6.1.0+Documentation" target="_blank">Fedora6 Documentation</a>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
       <!-- <p><b>Pid:</b> <span th:text="${do.pid}"></span></p> -->
       <!-- <p><b>Linked resource path: </b><span th:text="${do.resource.path}"></span></p> -->
       <!-- <p><b>Resource RDF metadata: </b><pre><span th:text="${do.resource.rdfXml}"></span></pre></p> -->
