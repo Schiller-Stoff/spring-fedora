@@ -30,4 +30,9 @@ public class SimpleClientController {
     return "digitalObject/show";
   }
 
+  @GetMapping
+  public String getIndex(){
+    return "index";
+  }
+
 }
