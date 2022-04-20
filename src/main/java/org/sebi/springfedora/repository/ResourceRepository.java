@@ -7,14 +7,13 @@ import java.net.URISyntaxException;
 import java.util.Optional;
 
 import org.apache.commons.io.IOUtils;
+import org.fcrepo.client.DeleteBuilder;
 import org.fcrepo.client.FcrepoClient;
 import org.fcrepo.client.FcrepoOperationFailedException;
 import org.fcrepo.client.FcrepoResponse;
 import org.fcrepo.client.GetBuilder;
 import org.fcrepo.client.PatchBuilder;
 import org.fcrepo.client.PutBuilder;
-import org.fcrepo.client.DeleteBuilder;
-import org.sebi.springfedora.Common;
 import org.sebi.springfedora.exception.ResourceRepositoryException;
 import org.sebi.springfedora.model.Resource;
 import org.springframework.http.HttpStatus;
@@ -57,12 +56,10 @@ public class ResourceRepository implements IResourceRepository {
           .perform()
     ) {
 
-      int statusCode = response.getStatusCode(); 
-
-      if(statusCode == 201 ){
+      if(response.getStatusCode() == 201 ){
         log.info("Succesfully saved resource with path: {} ", resource.getPath());
         return resource;
-      } else if (statusCode == 204){
+      } else if (response.getStatusCode() == 204){
         log.info("Succesfully saved resource with path: {}. Without content", resource.getPath());
         return resource;
       } else {
@@ -107,7 +104,6 @@ public class ResourceRepository implements IResourceRepository {
     try (
         final FcrepoClient client = FcrepoClient.client().build();
         FcrepoResponse response = new GetBuilder(uri, client)
-            .accept("application/rdf+xml")
             .perform()) {
 
       String turtleContent = IOUtils.toString(response.getBody(), "UTF-8");
