@@ -16,6 +16,7 @@ import org.fcrepo.client.PatchBuilder;
 import org.fcrepo.client.PutBuilder;
 import org.sebi.springfedora.exception.ResourceRepositoryException;
 import org.sebi.springfedora.model.Resource;
+import org.sebi.springfedora.repository.utils.RepositoryUtils;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Repository;
 import org.springframework.util.MimeType;
@@ -85,7 +86,7 @@ public class ResourceRepository implements IResourceRepository<Resource> {
 
   @Override
   public Optional<Resource> findById(String id) throws ResourceRepositoryException {
-    URI uri = parseToURI(id);
+    URI uri = RepositoryUtils.parseToURI(id);
 
     try (
         final FcrepoClient client = FcrepoClient.client().build();
@@ -146,7 +147,7 @@ public class ResourceRepository implements IResourceRepository<Resource> {
   @Override
   public void deleteById(String id) throws ResourceRepositoryException {
     
-    URI uri = parseToURI(id);
+    URI uri = RepositoryUtils.parseToURI(id);
     
     try (
       final FcrepoClient client = FcrepoClient.client().build();
@@ -213,7 +214,7 @@ public class ResourceRepository implements IResourceRepository<Resource> {
     Resource curResource = optional.get();
 
 
-    URI uri = parseToURI(url);
+    URI uri = RepositoryUtils.parseToURI(url);
 
     InputStream triplesIStream = IOUtils.toInputStream(sparql, "utf-8");
 
@@ -287,24 +288,6 @@ public class ResourceRepository implements IResourceRepository<Resource> {
       return uri;
     } catch (URISyntaxException e) {
       String msg = String.format("Failed to parse URI (out of path) for resource with path: %s. Applying status code: %d", resource.getPath(), HttpStatus.INTERNAL_SERVER_ERROR.value());
-      log.error(msg);
-      throw new ResourceRepositoryException(HttpStatus.INTERNAL_SERVER_ERROR.value(), msg);
-    }
-  }
-
-  /**
-   * Parses given uri as string to URI type.
-   * @param uri {String} to be parsed to URI
-   * @return parsed URI
-   * @throws ResourceRepositoryException unparsable URI.
-   */
-  private URI parseToURI(String uri) throws ResourceRepositoryException{
-    URI uriParsed = null;
-    try {
-      uriParsed = new URI(uri);
-      return uriParsed;
-    } catch (URISyntaxException e) {
-      String msg = String.format("Failed to parse URI (out of path) for string: %s. Applying status code: %d", uri, HttpStatus.INTERNAL_SERVER_ERROR.value());
       log.error(msg);
       throw new ResourceRepositoryException(HttpStatus.INTERNAL_SERVER_ERROR.value(), msg);
     }
