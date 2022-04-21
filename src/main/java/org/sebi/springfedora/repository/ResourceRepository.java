@@ -29,14 +29,7 @@ public class ResourceRepository implements IResourceRepository {
   @Override
   public <S extends Resource> S save(S resource) throws ResourceRepositoryException {
 
-    URI uri = null;
-    try {
-      uri = new URI(resource.getPath());
-    } catch (URISyntaxException e) {
-      String msg = String.format("Failed to parse URI (out of path) for resource with path: %s. Applying status code: %d", resource.getPath(), HttpStatus.INTERNAL_SERVER_ERROR.value());
-      log.error(msg);
-      throw new ResourceRepositoryException(HttpStatus.INTERNAL_SERVER_ERROR.value(), msg);
-    }
+    URI uri = retrieveResourceURI(resource);
 
     // TODO add more
     // POST given resource to Fedora
@@ -92,14 +85,7 @@ public class ResourceRepository implements IResourceRepository {
 
   @Override
   public Optional<Resource> findById(String id) throws ResourceRepositoryException {
-    URI uri = null;
-    try {
-      uri = new URI(id);
-    } catch (Exception e) {
-      String msg = String.format("Failed to parse uri from resource path: %s", id);
-      log.error(msg);
-      throw new ResourceRepositoryException(HttpStatus.INTERNAL_SERVER_ERROR.value(), msg);
-    }
+    URI uri = parseToURI(id);
 
     try (
         final FcrepoClient client = FcrepoClient.client().build();
@@ -160,12 +146,7 @@ public class ResourceRepository implements IResourceRepository {
   @Override
   public void deleteById(String id) throws ResourceRepositoryException {
     
-    URI uri = null;
-    try {
-      uri = new URI(id);
-    } catch(URISyntaxException e) {
-      log.error("Malformed uri at deteleById operation: for given id {} ", id);
-    }
+    URI uri = parseToURI(id);
     
     try (
       final FcrepoClient client = FcrepoClient.client().build();
@@ -232,13 +213,7 @@ public class ResourceRepository implements IResourceRepository {
     Resource curResource = optional.get();
 
 
-    URI uri;
-    try {
-      uri = new URI(url);
-    } catch(URISyntaxException e){
-      log.error("URI syntax exception for resource with path: {}", url);
-      return null;
-    }
+    URI uri = parseToURI(url);
 
     InputStream triplesIStream = IOUtils.toInputStream(sparql, "utf-8");
 
@@ -297,6 +272,42 @@ public class ResourceRepository implements IResourceRepository {
     }
     
     return "(No message from resource repository)";
+  }
+
+  /**
+   * Extracts uri from resource object parsed as URI.
+   * @param resource {Resource} from which the URI should be extracted.
+   * @return parsed resource's URI.
+   * @throws ResourceRepositoryException
+   */
+  private URI retrieveResourceURI(Resource resource) throws ResourceRepositoryException {
+    URI uri = null;
+    try {
+      uri = new URI(resource.getPath());
+      return uri;
+    } catch (URISyntaxException e) {
+      String msg = String.format("Failed to parse URI (out of path) for resource with path: %s. Applying status code: %d", resource.getPath(), HttpStatus.INTERNAL_SERVER_ERROR.value());
+      log.error(msg);
+      throw new ResourceRepositoryException(HttpStatus.INTERNAL_SERVER_ERROR.value(), msg);
+    }
+  }
+
+  /**
+   * Parses given uri as string to URI type.
+   * @param uri {String} to be parsed to URI
+   * @return parsed URI
+   * @throws ResourceRepositoryException unparsable URI.
+   */
+  private URI parseToURI(String uri) throws ResourceRepositoryException{
+    URI uriParsed = null;
+    try {
+      uriParsed = new URI(uri);
+      return uriParsed;
+    } catch (URISyntaxException e) {
+      String msg = String.format("Failed to parse URI (out of path) for string: %s. Applying status code: %d", uri, HttpStatus.INTERNAL_SERVER_ERROR.value());
+      log.error(msg);
+      throw new ResourceRepositoryException(HttpStatus.INTERNAL_SERVER_ERROR.value(), msg);
+    }
   }
 
 }
