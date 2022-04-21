@@ -2,73 +2,74 @@ package org.sebi.springfedora.repository.Datastream;
 
 import java.util.Optional;
 
+import org.apache.commons.lang3.NotImplementedException;
 import org.sebi.springfedora.model.Datastream;
+import org.sebi.springfedora.repository.ResourceRepository;
 
 public class DatastreamRepository implements IDatastreamRepository {
 
+  private ResourceRepository resourceRepository;
+
+  public DatastreamRepository(ResourceRepository resourceRepository){
+    this.resourceRepository = resourceRepository;
+  }
+
   @Override
   public <S extends Datastream> S save(S entity) {
-    // TODO Auto-generated method stub
-    return null;
+    throw new NotImplementedException("Method not implemented yet");
   }
 
   @Override
   public <S extends Datastream> Iterable<S> saveAll(Iterable<S> entities) {
-    // TODO Auto-generated method stub
-    return null;
+    throw new NotImplementedException("Method not implemented yet");
   }
 
   @Override
   public Optional<Datastream> findById(String id) {
-    // TODO Auto-generated method stub
-    return null;
+    throw new NotImplementedException("Method not implemented yet");
   }
 
   @Override
   public boolean existsById(String id) {
-    // TODO Auto-generated method stub
-    return false;
+    return resourceRepository.existsById(id);
   }
 
   @Override
   public Iterable<Datastream> findAll() {
-    // TODO Auto-generated method stub
-    return null;
+    throw new NotImplementedException("Method not implemented yet");
   }
 
   @Override
   public Iterable<Datastream> findAllById(Iterable<String> ids) {
-    // TODO Auto-generated method stub
-    return null;
+    throw new NotImplementedException("Method not implemented yet");
   }
 
   @Override
   public long count() {
-    // TODO Auto-generated method stub
-    return 0;
+    throw new NotImplementedException("Method not implemented yet");
   }
 
   @Override
   public void deleteById(String id) {
-    // TODO Auto-generated method stub
+    throw new NotImplementedException("Method not implemented yet");
     
   }
 
   @Override
   public void delete(Datastream entity) {
-    // TODO Auto-generated method stub
+    throw new NotImplementedException("Method not implemented yet");
     
   }
 
   @Override
   public void deleteAllById(Iterable<? extends String> ids) {
-    // TODO Auto-generated method stub
+    throw new NotImplementedException("Method not implemented yet");
     
   }
 
   @Override
   public void deleteAll(Iterable<? extends Datastream> entities) {
-    // TODO Auto-generated method stub
+    throw new NotImplementedException("Method not implemented yet");
     
   }
 
