@@ -1,4 +1,4 @@
-package org.sebi.springfedora.repository;
+package org.sebi.springfedora.repository.Datastream;
 
 import org.sebi.springfedora.model.Datastream;
 import org.springframework.data.repository.CrudRepository;

@@ -1,4 +1,4 @@
-package org.sebi.springfedora.repository;
+package org.sebi.springfedora.repository.Datastream;
 
 import java.util.Optional;
 
