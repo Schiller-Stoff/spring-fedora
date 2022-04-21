@@ -24,7 +24,7 @@ import lombok.extern.slf4j.Slf4j;
 
 @Repository
 @Slf4j
-public class ResourceRepository implements IResourceRepository {
+public class ResourceRepository implements IResourceRepository<Resource> {
 
   @Override
   public <S extends Resource> S save(S resource) throws ResourceRepositoryException {

@@ -8,7 +8,7 @@ import org.springframework.data.repository.CrudRepository;
 /**
  * Uses fedora to retrieve an arbitrary resource.
  */
-public interface IResourceRepository extends CrudRepository<Resource, String> {
+public interface IResourceRepository<T> extends CrudRepository<T, String> {
   
   public Resource updateResourceTriples(String url, String sparql) throws ResourceRepositoryException;
 
