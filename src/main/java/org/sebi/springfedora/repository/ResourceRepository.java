@@ -71,6 +71,9 @@ public class ResourceRepository implements IResourceRepository<Resource> {
       log.error(msg + "\n" + e1);
       throw new ResourceRepositoryException(e1.getStatusCode(), msg);
     } catch (Exception e){
+      // pass through thrown if status codes are 400+ from above
+      if(e instanceof ResourceRepositoryException) throw e;
+      
       String msg = String.format("Failed to save resource with path %s. Original message: ", resource.getPath(), e.getMessage());
       log.error(msg + "\n" + e);
       throw new ResourceRepositoryException(HttpStatus.INTERNAL_SERVER_ERROR.value(), msg);
@@ -260,7 +263,7 @@ public class ResourceRepository implements IResourceRepository<Resource> {
    * @return
    * @throws IOException
    */
-  private String retrieveFedoraErrBodyMsg(FcrepoResponse fcrepoResponse) throws IOException {
+  public String retrieveFedoraErrBodyMsg(FcrepoResponse fcrepoResponse) throws IOException {
     
     if(fcrepoResponse.getBody() != null){
       try {
