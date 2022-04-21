@@ -1,8 +1,13 @@
 package org.sebi.springfedora.model;
 
-import lombok.Data;
+import org.springframework.util.MimeType;
 
-@Data
-public class Datastream {
-  private String dsId; 
+
+
+public class Datastream extends Resource {
+  //private String dsId; 
+
+  public Datastream(String path, String rdfXml, MimeType mimeType){
+    super(path, rdfXml, mimeType);
+  }
 }
