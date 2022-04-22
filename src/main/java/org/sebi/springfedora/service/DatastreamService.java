@@ -49,6 +49,13 @@ public class DatastreamService implements IDatastreamService  {
       throw new ResourceRepositoryException(HttpStatus.CONFLICT.value(), msg);
     }
 
+    // datastreams are only allowed if object exists
+    if(!digitalObjectService.checkIfExists(pid)){
+      String msg = String.format("Digital object not found. Creation of datastream with id %s at path %s failed. Linked digital object with pid: %s does not exist! Tried mimetype: %s", id, path, pid, mimetype);
+      log.error(msg);
+      throw new ResourceRepositoryException(HttpStatus.NOT_FOUND.value(), msg);
+    }
+
     Datastream datastream = new Datastream(path, "", MimeType.valueOf(mimetype), content);
 
     return datastreamRepository.save(datastream);
