@@ -22,7 +22,8 @@ public class SimpleDSController {
 
   @GetMapping("{pid}/{dsid}")
   public Datastream createSampleDatastream(@PathVariable String pid, @PathVariable String dsid) throws ResourceRepositoryException {
-    return this.datastreamService.createById(dsid, "text/plain", pid);
+    String textFile = "Textfile with pid and dsid: " + pid + " - " + dsid;
+    return this.datastreamService.createById(dsid, "text/plain", pid, textFile.getBytes());
   }
 
 }
