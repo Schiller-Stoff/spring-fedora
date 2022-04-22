@@ -1,5 +1,6 @@
 package org.sebi.springfedora.repository.Datastream;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
@@ -43,17 +44,16 @@ public class DatastreamRepository implements IDatastreamRepository {
     URI uri = RepositoryUtils.parseToURI(datastream.getPath()); 
     String curMimetype = datastream.getMimeType().toString();
 
-
-    // String triples = resource.getRdfXml() != "" ? Common.ADDRDFPROPERTY.replace("$1", resource.getRdfXml()) : "";
     String triples = datastream.getRdfXml();
-    InputStream triplesIStream = IOUtils.toInputStream(datastream.getRdfXml(), "utf-8");
+
+    InputStream content = new ByteArrayInputStream(datastream.getContent()); 
 
     log.info("Initiating PUT request for datastream: {}. With rdf: {}", datastream.getPath(), triples);
 
     try (
       final FcrepoClient client = FcrepoClient.client().build();
       FcrepoResponse response = new PutBuilder(uri, client)
-          .body( triplesIStream, curMimetype)
+          .body( content, curMimetype)
           .perform()
     ) {
 
@@ -106,9 +106,9 @@ public class DatastreamRepository implements IDatastreamRepository {
 
       //String turtleContent = IOUtils.toString(response.getBody(), "UTF-8");
       MimeType mimeType = MimeType.valueOf(response.getContentType());
+      byte[] content = IOUtils.toByteArray(response.getBody());
 
-      Datastream datastream = new Datastream(id, "", mimeType);
-      //Resource resource = new Resource(id, turtleContent, MimeType.valueOf("application/rdf+xml"));
+      Datastream datastream = new Datastream(id, "", mimeType, content);
 
       if(response.getStatusCode() == 200){
         log.info("Found resource with uri {} inside fedora", datastream.getPath());
