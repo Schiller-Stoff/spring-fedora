@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.util.MimeType;
+import org.springframework.web.multipart.MultipartFile;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -35,7 +36,7 @@ public class DatastreamService implements IDatastreamService  {
   }
   
 
-  public Datastream createById(String id, String mimetype, String pid) throws ResourceRepositoryException {
+  public Datastream createById(String id, String mimetype, String pid, byte[] content) throws ResourceRepositoryException {
     
     String mappedPid = digitalObjectService.mapPidToResourcePath(pid);
 
@@ -48,7 +49,7 @@ public class DatastreamService implements IDatastreamService  {
       throw new ResourceRepositoryException(HttpStatus.CONFLICT.value(), msg);
     }
 
-    Datastream datastream = new Datastream(path, "", MimeType.valueOf(mimetype));
+    Datastream datastream = new Datastream(path, "", MimeType.valueOf(mimetype), content);
 
     return datastreamRepository.save(datastream);
   }
