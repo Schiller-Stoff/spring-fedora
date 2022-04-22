@@ -20,9 +20,9 @@ public class SimpleDSController {
     this.datastreamService = datastreamService;
   }
 
-  @GetMapping("{path}")
-  public Datastream createSampleDatastream(@PathVariable String path) throws ResourceRepositoryException {
-    return this.datastreamService.createById(path, "text/plain");
+  @GetMapping("{pid}/{dsid}")
+  public Datastream createSampleDatastream(@PathVariable String pid, @PathVariable String dsid) throws ResourceRepositoryException {
+    return this.datastreamService.createById(dsid, "text/plain", pid);
   }
 
 }
