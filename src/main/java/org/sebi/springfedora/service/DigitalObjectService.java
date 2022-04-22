@@ -11,6 +11,7 @@ import org.sebi.springfedora.model.DigitalObject;
 import org.sebi.springfedora.model.Resource;
 import org.sebi.springfedora.repository.IResourceRepository;
 import org.sebi.springfedora.utils.Rename;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.util.MimeType;
@@ -22,6 +23,12 @@ import lombok.extern.slf4j.Slf4j;
 public class DigitalObjectService implements IDigitalObjectService {
 	
   private IResourceRepository resourceRepository;	
+
+  @Value("${gams.curHost}")
+  private String curHost;
+
+  @Value("${gams.fedoraRESTEndpoint}")
+  private String fedoraRESTEndpoint;
 	
   public DigitalObjectService(IResourceRepository resourceRepository ) {
 	  
@@ -108,8 +115,36 @@ public class DigitalObjectService implements IDigitalObjectService {
     return digitalObject;
   }
 
+  /**
+   * Checks if the digital object exists.
+   * (If for the pid exists a resource with mapped resource path)
+   */
+  @Override
+  public boolean checkIfExists(String pid){
+    String resourcePath = this.mapObjectResourcePath(pid);
+    return resourceRepository.existsById(resourcePath);
+  }
+
+  /**
+   * Maps pid to fedora resource path part e.g. like o:derla.sty to /objects/derla.sty.
+   * DOES NOT apply the full resource address like https://localhost:8080/rest/objects/derla.sty
+   */
+  @Override
   public String mapPidToResourcePath(String pid){
     return Rename.rename(pid);
+  }
+
+  /**
+   * Maps given pid to full resource address like o:derla.sty to like https://localhost:8080/rest/objects/derla.sty
+   * dependent on spring environment variables.
+   */
+  @Override
+  public String mapObjectResourcePath(String pid) {
+    
+    String mappedPid = mapPidToResourcePath(pid);
+    String resourcePath = curHost + fedoraRESTEndpoint + mappedPid;
+
+    return resourcePath;
   }
 
 }
