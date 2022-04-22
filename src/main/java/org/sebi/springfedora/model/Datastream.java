@@ -1,9 +1,6 @@
 package org.sebi.springfedora.model;
 
 import org.springframework.util.MimeType;
-import org.springframework.web.multipart.MultipartFile;
-
-import lombok.Data;
 
 public class Datastream extends Resource {
   //private String dsId; 
@@ -16,5 +13,9 @@ public class Datastream extends Resource {
 
   public byte[] getContent(){
     return this.content;
+  }
+
+  public void setContent(byte[] content){
+    this.content = content;
   }
 }
