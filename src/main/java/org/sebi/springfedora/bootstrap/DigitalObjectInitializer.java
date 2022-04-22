@@ -117,7 +117,7 @@ public class DigitalObjectInitializer implements CommandLineRunner {
      * Creation of datastreams
      */
     try {
-      datastreamService.createById("aggregations/example", "text/plain");
+      datastreamService.createById("GML_SOURCE", "text/plain", "o:derla.sty");
     } catch(ResourceRepositoryException e){
       // skip already created
     }
