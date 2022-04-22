@@ -35,7 +35,7 @@ public class DigitalObjectService implements IDigitalObjectService {
 
   @Override
   public DigitalObject createDigitalObjectByPid(String pid, String rdf) throws ResourceRepositoryException {
-    String mappedFedora6Path = Rename.rename(pid);
+    String mappedFedora6Path = this.mapPidToResourcePath(pid);
   
     String resourcePath = "http://localhost:8082/rest/" + mappedFedora6Path; 
 
@@ -106,6 +106,10 @@ public class DigitalObjectService implements IDigitalObjectService {
     this.resourceRepository.updateResourceTriples(digitalObject.getResource().getPath(), sparql);
 
     return digitalObject;
+  }
+
+  public String mapPidToResourcePath(String pid){
+    return Rename.rename(pid);
   }
 
 }
