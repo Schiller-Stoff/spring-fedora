@@ -35,13 +35,14 @@ public class DatastreamService implements IDatastreamService  {
 
   public Datastream createById(String id, String mimetype) throws ResourceRepositoryException {
     
-    // if(datastreamRepository.existsById(id)){
-    //   String msg = String.format("Creation of datastream at path %s failed. Found and already existing resource. Tried mimetype: ", id, mimetype);
-    //   log.error(msg);
-    //   throw new ResourceRepositoryException(HttpStatus.EXPECTATION_FAILED.value(), msg);
-    // }
-
     String path = curHost + fedoraRESTEndpoint + id;
+
+    // throw if already exists
+    if(datastreamRepository.existsById(path)){
+      String msg = String.format("Creation of datastream with id %s at path %s failed. Found and already existing resource. Tried mimetype: %s", id, path, mimetype);
+      log.error(msg);
+      throw new ResourceRepositoryException(HttpStatus.CONFLICT.value(), msg);
+    }
 
     Datastream datastream = new Datastream(path, "", MimeType.valueOf(mimetype));
 
