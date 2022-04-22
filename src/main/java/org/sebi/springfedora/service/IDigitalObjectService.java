@@ -17,4 +17,5 @@ public interface IDigitalObjectService {
 
   public DigitalObject updateDatastreamByPid(String pid, String sparql) throws ResourceRepositoryException;
 
+  public String mapPidToResourcePath(String pid);
 }
