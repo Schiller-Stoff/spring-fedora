@@ -13,6 +13,7 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 import org.springframework.util.MimeType;
+import org.springframework.web.multipart.MultipartFile;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -117,7 +118,11 @@ public class DigitalObjectInitializer implements CommandLineRunner {
      * Creation of datastreams
      */
     try {
-      datastreamService.createById("GML_SOURCE", "text/plain", "o:derla.sty");
+      String gmlSource = "<gml>TestGml</gml>";
+      String mimetype = "application/xml";
+
+      datastreamService.createById("GML_SOURCE", mimetype, "o:derla.sty", gmlSource.getBytes());
+      datastreamService.createById("SOME_TEXT", "text/plain", "o:derla.sty", "This is text".getBytes());
     } catch(ResourceRepositoryException e){
       // skip already created
     }
