@@ -16,6 +16,7 @@ import lombok.extern.slf4j.Slf4j;
 public class DatastreamService implements IDatastreamService  {
 
   private DatastreamRepository datastreamRepository;
+  private IDigitalObjectService digitalObjectService;
 
   @Value("${gams.curHost}")
   private String curHost;
@@ -23,8 +24,9 @@ public class DatastreamService implements IDatastreamService  {
   @Value("${gams.fedoraRESTEndpoint}")
   private String fedoraRESTEndpoint;
 
-  public DatastreamService(DatastreamRepository datastreamRepository){
+  public DatastreamService(DatastreamRepository datastreamRepository, IDigitalObjectService digitalObjectService){
     this.datastreamRepository = datastreamRepository;
+    this.digitalObjectService = digitalObjectService;
   }
 
   @Override
@@ -33,9 +35,11 @@ public class DatastreamService implements IDatastreamService  {
   }
   
 
-  public Datastream createById(String id, String mimetype) throws ResourceRepositoryException {
+  public Datastream createById(String id, String mimetype, String pid) throws ResourceRepositoryException {
     
-    String path = curHost + fedoraRESTEndpoint + id;
+    String mappedPid = digitalObjectService.mapPidToResourcePath(pid);
+
+    String path = curHost + fedoraRESTEndpoint + mappedPid + "/datastream/" + id;
 
     // throw if already exists
     if(datastreamRepository.existsById(path)){
