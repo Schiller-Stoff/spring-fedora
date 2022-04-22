@@ -4,8 +4,10 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.sebi.springfedora.exception.ResourceRepositoryException;
+import org.sebi.springfedora.model.Datastream;
 import org.sebi.springfedora.model.Resource;
 import org.sebi.springfedora.repository.IResourceRepository;
+import org.sebi.springfedora.service.IDatastreamService;
 import org.sebi.springfedora.service.IDigitalObjectService;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Profile;
@@ -21,10 +23,12 @@ public class DigitalObjectInitializer implements CommandLineRunner {
 
   private final IDigitalObjectService DOService;
   private final IResourceRepository resourceRepository;
+  private final IDatastreamService datastreamService;
 
-  public DigitalObjectInitializer(IDigitalObjectService DOService, IResourceRepository resourceRepository) {
+  public DigitalObjectInitializer(IDigitalObjectService DOService, IResourceRepository resourceRepository, IDatastreamService datastreamService) {
     this.DOService = DOService;
     this.resourceRepository = resourceRepository;
+    this.datastreamService = datastreamService;
   }
 
   @Override
@@ -51,9 +55,11 @@ public class DigitalObjectInitializer implements CommandLineRunner {
       new Resource("http://localhost:8082/rest/aggregations/query", "",MimeType.valueOf("text/turtle")),
       new Resource("http://localhost:8082/rest/cm4f", "",MimeType.valueOf("text/turtle")),
       new Resource("http://localhost:8082/rest/cm4f/defaults", "",MimeType.valueOf("text/turtle"))
+      // new Resource("http://localhost:8082/rest/cm4f/defaults/sampleText9", "", MimeType.valueOf("text/plain"), "".getBytes())
     );
     
     resourceList.forEach(resource -> {
+      
       if(resourceRepository.existsById(resource.getPath())){
         log.debug("Bootstrap: Skipping resource creation because already existing at uri: {}" , resource.getPath()); 
       } else {
@@ -106,6 +112,16 @@ public class DigitalObjectInitializer implements CommandLineRunner {
     }
     
 
+
+    /**
+     * Creation of datastreams
+     */
+    try {
+      datastreamService.createById("aggregations/example", "text/plain");
+    } catch(ResourceRepositoryException e){
+      // skip already created
+    }
+    
 
   }
 
