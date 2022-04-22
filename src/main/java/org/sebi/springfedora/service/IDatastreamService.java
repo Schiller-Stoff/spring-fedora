@@ -5,5 +5,5 @@ import org.sebi.springfedora.model.Datastream;
 
 public interface IDatastreamService {
   public Datastream findById();
-  public Datastream createById(String id, String mimetype, String pid) throws ResourceRepositoryException;
+  public Datastream createById(String id, String mimetype, String pid, byte[] content) throws ResourceRepositoryException;
 }
