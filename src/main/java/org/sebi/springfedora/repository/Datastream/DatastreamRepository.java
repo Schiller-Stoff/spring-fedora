@@ -11,14 +11,17 @@ import org.fcrepo.client.FcrepoClient;
 import org.fcrepo.client.FcrepoLink;
 import org.fcrepo.client.FcrepoOperationFailedException;
 import org.fcrepo.client.FcrepoResponse;
+import org.fcrepo.client.GetBuilder;
 import org.fcrepo.client.PostBuilder;
 import org.fcrepo.client.PutBuilder;
 import org.sebi.springfedora.exception.ResourceRepositoryException;
 import org.sebi.springfedora.model.Datastream;
+import org.sebi.springfedora.model.Resource;
 import org.sebi.springfedora.repository.ResourceRepository;
 import org.sebi.springfedora.repository.utils.RepositoryUtils;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Repository;
+import org.springframework.util.MimeType;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -93,12 +96,46 @@ public class DatastreamRepository implements IDatastreamRepository {
 
   @Override
   public Optional<Datastream> findById(String id) {
-    throw new NotImplementedException("Method not implemented yet");
+    URI uri = RepositoryUtils.parseToURI(id);
+
+    try (
+        final FcrepoClient client = FcrepoClient.client().build();
+        FcrepoResponse response = new GetBuilder(uri, client)
+            .perform()
+    ) {
+
+      //String turtleContent = IOUtils.toString(response.getBody(), "UTF-8");
+      MimeType mimeType = MimeType.valueOf(response.getContentType());
+
+      Datastream datastream = new Datastream(id, "", mimeType);
+      //Resource resource = new Resource(id, turtleContent, MimeType.valueOf("application/rdf+xml"));
+
+      if(response.getStatusCode() == 200){
+        log.info("Found resource with uri {} inside fedora", datastream.getPath());
+        return Optional.of(datastream);
+      } else if(response.getStatusCode() == 404) {
+        log.info("GET request for resource {} succesfull. Found no resource at given path. ", datastream.getPath());
+        return Optional.empty();
+      } else {
+        String msg = String.format("Failed to GET resource from fedora at uri: %s. Original resource response body: %s", datastream.getPath(), resourceRepository.retrieveFedoraErrBodyMsg(response));
+        log.error(msg);
+        throw new ResourceRepositoryException(response.getStatusCode(), msg);
+      }
+
+    } catch (IOException e) {
+      String msg = String.format("GET request for resource with path: %s failed. Original err msg: %s", id, e.getMessage());
+      log.error(msg + "\n" + e);
+      throw new ResourceRepositoryException(HttpStatus.INTERNAL_SERVER_ERROR.value(), msg);
+    } catch (FcrepoOperationFailedException e1) {
+      String msg = String.format("GET request for resource with path: %s failed. Original err msg: %s", id, e1.getMessage());
+      log.error(msg + "\n" + e1);
+      throw new ResourceRepositoryException(e1.getStatusCode(), msg);
+    }
   }
 
   @Override
   public boolean existsById(String id) {
-    return resourceRepository.existsById(id);
+    return !this.findById(id).isEmpty();
   }
 
   @Override
