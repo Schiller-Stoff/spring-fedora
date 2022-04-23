@@ -35,6 +35,13 @@ public class DatastreamService implements IDatastreamService  {
     throw new NotImplementedException("Method not implemented");
   }
   
+  @Override
+  public void deleteByDsid(String pid, String dsid) {
+    String mappedPid = digitalObjectService.mapPidToResourcePath(pid);
+    String path = curHost + fedoraRESTEndpoint + mappedPid + "/datastream/" + dsid;
+    datastreamRepository.deleteById(path);
+    
+  }
 
   public Datastream createById(String id, String mimetype, String pid, byte[] content) throws ResourceRepositoryException {
     

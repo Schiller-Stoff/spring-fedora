@@ -155,7 +155,9 @@ public class DatastreamRepository implements IDatastreamRepository {
 
   @Override
   public void deleteById(String id) {
-    throw new NotImplementedException("Method not implemented yet");
+    resourceRepository.deleteById(id);
+    resourceRepository.deleteById(id + "/fcr:tombstone");
+    //throw new NotImplementedException("Method not implemented yet");
     
   }
 
