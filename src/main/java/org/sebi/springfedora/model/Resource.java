@@ -24,6 +24,9 @@ public class Resource {
     // optional binary described by resource
     private byte[] binary; 
 
+    // ldp:contains of resource
+    private String[] children;
+
     public Resource(String path, String rdfXml, MimeType mimeType){
         this.path = path;
         this.rdfXml = rdfXml;
@@ -33,6 +36,11 @@ public class Resource {
     public Resource(String path, String rdfXml, MimeType mimeType, byte[] binary){
         this(path, rdfXml, mimeType);
         this.binary = binary;
+    }
+
+    public Resource(String path, String rdfXml, MimeType mimeType, String[] children){
+        this(path, rdfXml, mimeType);
+        this.children = children;
     }
 
 }
