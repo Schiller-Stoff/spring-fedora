@@ -15,6 +15,9 @@
       <br/>
       <h2 class="h3">Data update</h2>
       <p><b>Available datastreams</b></p>
+      <ul th:each="dstream : ${do.resource.children}">
+        <li th:text="${dstream}"></li>
+      </ul>
       <p><b>Add a datastream</b></p>
       <form
         action="#"
