@@ -10,6 +10,7 @@ import org.sebi.springfedora.service.IDigitalObjectService;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.util.MimeType;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -75,6 +76,14 @@ public class SimpleClientController {
     model.addAttribute("datastream", datastream);
 
     return "redirect:/client/" + digitalObject.getPid();
+  }
+
+  @DeleteMapping("/deleteDatastream")
+  public String deleteDatastream(@RequestParam String dsid, @RequestParam String pid){
+
+    datastreamService.deleteByDsid(pid, dsid);
+
+    return "redirect:/client/" + pid;
   }
 
 }
