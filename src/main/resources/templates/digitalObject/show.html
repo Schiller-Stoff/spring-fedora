@@ -19,6 +19,7 @@
         <li class="list-group-item d-flex justify-content-between align-items-center">
           <a target="_blank" th:text="${dstreamUri}" th:href="${dstreamUri} + '/fcr:metadata'"></a>
           <form
+            onsubmit="return confirm('Are you sure you want to delete the datastream?');"
             action="#"
             th:action="@{/client/deleteDatastream}"
             th:object="${do}"
