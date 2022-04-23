@@ -15,11 +15,23 @@
       <br/>
       <h2 class="h3">Data update</h2>
       <p><b>Available datastreams</b></p>
-      <ul th:each="dstreamUri : ${do.resource.children}">
-        <li>
+      <ul th:each="dstreamUri : ${do.resource.children}" class="list-group mb-1">
+        <li class="list-group-item d-flex justify-content-between align-items-center">
           <a target="_blank" th:text="${dstreamUri}" th:href="${dstreamUri} + '/fcr:metadata'"></a>
+          <form
+            action="#"
+            th:action="@{/client/deleteDatastream}"
+            th:object="${do}"
+            method="delete"
+            th:method="DELETE"
+          >
+            <input type="hidden" name="pid" th:field="*{pid}"/>
+            <input type="hidden" name="dsid" th:value="${#strings.substringAfter(dstreamUri,'/datastream/')}"/>
+            <input type="submit" class="btn btn-warning" value="Delete"/>
+          </form>
         </li>
       </ul>
+      <br/>
       <p><b>Add a datastream</b></p>
       <form
         action="#"
