@@ -12,6 +12,28 @@
       <p><b>Pid:</b> <span th:text="${do.pid}"></span></p>
       <p><b>Linked resource path: </b><span th:text="${do.resource.path}"></span></p>
       <p><b>Resource RDF metadata: </b><pre class="bg-light p-3"><span th:text="${do.resource.rdfXml}"></span></pre></p>
+      <br/>
+      <h2 class="h3">Data update</h2>
+      <p><b>Available datastreams</b></p>
+      <p><b>Add a datastream</b></p>
+      <form
+        action="#"
+        th:action="@{/client/createDatastream}"
+        th:object="${do}"
+        method="post"
+        enctype="multipart/form-data"
+      >
+        <input id="pid" type="hidden" th:field="*{pid}"/>
+        <p>Datastream id: <input type="text" id="dsid" name="dsid"/></p>
+        <p>Upload file <input type="file" id="file" name="file"/></p>
+        <!-- <label for="fname">First name:</label> -->
+        <!-- <input type="text" id="lname" name="lname"><br><br> -->
+        
+        <p>
+          <input type="submit" value="Submit"/>
+          <input type="reset" value="Reset" />
+        </p>
+      </form>
     </main>
 
     <footer th:replace="/fragments/general.html :: footer"></footer>
