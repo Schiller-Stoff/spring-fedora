@@ -6,6 +6,8 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Optional;
 
+import javax.xml.parsers.ParserConfigurationException;
+
 import org.apache.commons.io.IOUtils;
 import org.fcrepo.client.DeleteBuilder;
 import org.fcrepo.client.FcrepoClient;
@@ -20,6 +22,7 @@ import org.sebi.springfedora.repository.utils.RepositoryUtils;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Repository;
 import org.springframework.util.MimeType;
+import org.xml.sax.SAXException;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -94,20 +97,21 @@ public class ResourceRepository implements IResourceRepository<Resource> {
     try (
         final FcrepoClient client = FcrepoClient.client().build();
         FcrepoResponse response = new GetBuilder(uri, client)
-            .perform()) {
-
-      String turtleContent = IOUtils.toString(response.getBody(), "UTF-8");
-
-      Resource resource = new Resource(id, turtleContent, MimeType.valueOf("application/rdf+xml"));
+            .accept("application/rdf+xml")
+            .perform()
+        ) {
 
       if(response.getStatusCode() == 200){
+        String turtleContent = IOUtils.toString(response.getBody(), "UTF-8");
+        String[] datastreams = ResourceRDFMapper.parseRDFChildren(turtleContent);
+        Resource resource = new Resource(id, turtleContent, MimeType.valueOf("application/rdf+xml"), datastreams);
         log.info("Found resource with uri {} inside fedora", resource.getPath());
         return Optional.of(resource);
       } else if(response.getStatusCode() == 404) {
-        log.info("GET request for resource {} succesfull. Found no resource at given path. ", resource.getPath());
+        log.info("GET request for resource {} succesfull. Found no resource at given path. ", uri.toString());
         return Optional.empty();
       } else {
-        String msg = String.format("Failed to GET resource from fedora at uri: %s. Original resource response body: %s", resource.getPath(), retrieveFedoraErrBodyMsg(response));
+        String msg = String.format("Failed to GET resource from fedora at uri: %s. Original resource response body: %s", uri.toString(), retrieveFedoraErrBodyMsg(response));
         log.error(msg);
         throw new ResourceRepositoryException(response.getStatusCode(), msg);
       }
