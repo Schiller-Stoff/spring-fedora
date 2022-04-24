@@ -7,6 +7,7 @@ import org.sebi.springfedora.Common;
 import org.sebi.springfedora.exception.ResourceNotFoundException;
 import org.sebi.springfedora.exception.ResourceRepositoryException;
 import org.sebi.springfedora.model.DigitalObject;
+import org.sebi.springfedora.repository.DigitalObject.IDigitalObjectRepository;
 import org.sebi.springfedora.service.IDigitalObjectService;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -18,9 +19,11 @@ import org.springframework.web.bind.annotation.RestController;
 public class SimpleDOController {
   
   private IDigitalObjectService digitalObjectService;
+  private IDigitalObjectRepository digitalObjectRepository;
   
-  public SimpleDOController(IDigitalObjectService digitalObjectService) {
+  public SimpleDOController(IDigitalObjectService digitalObjectService, IDigitalObjectRepository digitalObjectRepository) {
 	  this.digitalObjectService = digitalObjectService;
+    this.digitalObjectRepository = digitalObjectRepository;
   }
 	
 
@@ -52,6 +55,9 @@ public class SimpleDOController {
     return this.digitalObjectService.updateDatastreamByPid(pid, sparql);
   }
 
-
+  @GetMapping("")
+  public Iterable<DigitalObject> getAllDOs(){
+    return digitalObjectRepository.findAll();
+  }
 
 }
