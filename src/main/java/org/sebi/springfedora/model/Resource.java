@@ -17,29 +17,17 @@ public class Resource {
 
     // RDF info from resource  
     private String rdfXml;
-    
-    // mimetype of contained datastream
-    private MimeType mimeType;
-
-    // optional binary described by resource
-    private byte[] binary; 
 
     // ldp:contains of resource
     private String[] children;
 
-    public Resource(String path, String rdfXml, MimeType mimeType){
+    public Resource(String path, String rdfXml){
         this.path = path;
         this.rdfXml = rdfXml;
-        this.mimeType = mimeType;
     }
 
-    public Resource(String path, String rdfXml, MimeType mimeType, byte[] binary){
-        this(path, rdfXml, mimeType);
-        this.binary = binary;
-    }
-
-    public Resource(String path, String rdfXml, MimeType mimeType, String[] children){
-        this(path, rdfXml, mimeType);
+    public Resource(String path, String rdfXml, String[] children){
+        this(path, rdfXml);
         this.children = children;
     }
 

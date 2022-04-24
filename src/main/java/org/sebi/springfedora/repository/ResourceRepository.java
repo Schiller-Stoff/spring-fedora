@@ -104,7 +104,7 @@ public class ResourceRepository implements IResourceRepository<Resource> {
       if(response.getStatusCode() == 200){
         String turtleContent = IOUtils.toString(response.getBody(), "UTF-8");
         String[] datastreams = ResourceRDFMapper.parseRDFChildren(turtleContent);
-        Resource resource = new Resource(id, turtleContent, MimeType.valueOf("application/rdf+xml"), datastreams);
+        Resource resource = new Resource(id, turtleContent, datastreams);
         log.info("Found resource with uri {} inside fedora", resource.getPath());
         return Optional.of(resource);
       } else if(response.getStatusCode() == 404) {

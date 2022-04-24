@@ -52,7 +52,7 @@ public class DigitalObjectService implements IDigitalObjectService {
       throw new ResourceRepositoryException(HttpStatus.CONFLICT.value(), msg);
     }
 
-    Resource resource = new Resource(resourcePath, rdf, MimeType.valueOf("text/turtle"));
+    Resource resource = new Resource(resourcePath, rdf);
 
     this.resourceRepository.save(resource);
     

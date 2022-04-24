@@ -49,13 +49,13 @@ public class DigitalObjectInitializer implements CommandLineRunner {
 
     // create basic resources
     List<Resource> resourceList = Arrays.asList(
-      new Resource("http://localhost:8082/rest/objects", "", MimeType.valueOf("text/turtle")),
-      new Resource("http://localhost:8082/rest/aggregations", "",MimeType.valueOf("text/turtle")),
-      new Resource("http://localhost:8082/rest/aggregations/context", "",MimeType.valueOf("text/turtle")),
-      new Resource("http://localhost:8082/rest/aggregations/corpus", "",MimeType.valueOf("text/turtle")),
-      new Resource("http://localhost:8082/rest/aggregations/query", "",MimeType.valueOf("text/turtle")),
-      new Resource("http://localhost:8082/rest/cm4f", "",MimeType.valueOf("text/turtle")),
-      new Resource("http://localhost:8082/rest/cm4f/defaults", "",MimeType.valueOf("text/turtle"))
+      new Resource("http://localhost:8082/rest/objects", ""),
+      new Resource("http://localhost:8082/rest/aggregations", ""),
+      new Resource("http://localhost:8082/rest/aggregations/context", ""),
+      new Resource("http://localhost:8082/rest/aggregations/corpus", ""),
+      new Resource("http://localhost:8082/rest/aggregations/query", ""),
+      new Resource("http://localhost:8082/rest/cm4f", ""),
+      new Resource("http://localhost:8082/rest/cm4f/defaults", "")
       // new Resource("http://localhost:8082/rest/cm4f/defaults/sampleText9", "", MimeType.valueOf("text/plain"), "".getBytes())
     );
     

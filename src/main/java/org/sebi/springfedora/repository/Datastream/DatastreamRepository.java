@@ -42,7 +42,7 @@ public class DatastreamRepository implements IDatastreamRepository {
     verifyExpecetedMimetype(datastream);
 
     URI uri = RepositoryUtils.parseToURI(datastream.getPath()); 
-    String curMimetype = datastream.getMimeType().toString();
+    String curMimetype = datastream.getMimetype().toString();
 
     String triples = datastream.getRdfXml();
 
@@ -197,7 +197,7 @@ public class DatastreamRepository implements IDatastreamRepository {
   private void verifyExpecetedMimetype(Datastream datastream) throws ResourceRepositoryException{
     
     String rdfFormats = "text/turtle, text/rdf+n3, application/n3, text/n3, application/rdf+xml, application/n-triples, application/ld+json";
-    String mimetype = datastream.getMimeType().toString();
+    String mimetype = datastream.getMimetype().toString();
      
 
     if(rdfFormats.contains(mimetype)){

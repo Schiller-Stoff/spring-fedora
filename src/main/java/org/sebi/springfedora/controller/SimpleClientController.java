@@ -59,7 +59,7 @@ public class SimpleClientController {
 
   @GetMapping("/createObject")
   public String createObject(Model model){
-    model.addAttribute("do", new DigitalObject("testpid", new Resource("", "",MimeType.valueOf("text/turtle"))));
+    model.addAttribute("do", new DigitalObject("testpid", new Resource("", "")));
     return "digitalObject/create";
   }
 
