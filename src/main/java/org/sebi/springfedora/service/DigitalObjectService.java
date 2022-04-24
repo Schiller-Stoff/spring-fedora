@@ -56,7 +56,7 @@ public class DigitalObjectService implements IDigitalObjectService {
 
     this.resourceRepository.save(resource);
     
-    return new DigitalObject(pid, resource);
+    return new DigitalObject(pid, resourcePath, rdf);
   }
 
   @Override
@@ -81,7 +81,8 @@ public class DigitalObjectService implements IDigitalObjectService {
 
     if(optional.isPresent()){
       Resource resource = optional.orElseThrow();
-      DigitalObject digitalObject = new DigitalObject(pid, resource);
+      DigitalObject digitalObject = new DigitalObject(pid, resource.getPath(), resource.getRdfXml(), resource.getChildren());
+      log.info("Found digital object with pid: {}. Related resource path: {}", pid, resource.getPath());
       return digitalObject;
     } else {
       String msg = String.format("Couldn't find object with pid %s . Tried to GET from ResourceRepository path: %s", pid, uri);
@@ -95,10 +96,10 @@ public class DigitalObjectService implements IDigitalObjectService {
   @Override
   public DigitalObject deleteDigitalObjectByPid(String pid) throws ResourceRepositoryException {
     DigitalObject digitalObject = this.findDigitalObjectByPid(pid);
-    this.resourceRepository.deleteById(digitalObject.getResource().getPath());
+    this.resourceRepository.deleteById(digitalObject.getPath());
 
     // this will ensure that the tombstone from fedora is also deleted.
-    this.resourceRepository.deleteById(digitalObject.getResource().getPath() + "/fcr:tombstone");
+    this.resourceRepository.deleteById(digitalObject.getPath() + "/fcr:tombstone");
     
     return digitalObject;
   }
@@ -110,7 +111,7 @@ public class DigitalObjectService implements IDigitalObjectService {
 
     DigitalObject digitalObject = this.findDigitalObjectByPid(pid);
 
-    this.resourceRepository.updateResourceTriples(digitalObject.getResource().getPath(), sparql);
+    this.resourceRepository.updateResourceTriples(digitalObject.getPath(), sparql);
 
     return digitalObject;
   }

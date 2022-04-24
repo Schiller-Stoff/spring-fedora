@@ -40,7 +40,7 @@ public class SimpleClientController {
     DigitalObject digitalObject = digitalObjectService.findDigitalObjectByPid(pid);
 
     model.addAttribute("do", digitalObject);
-
+    
     return "digitalObject/show";
   }
 
@@ -59,7 +59,7 @@ public class SimpleClientController {
 
   @GetMapping("/createObject")
   public String createObject(Model model){
-    model.addAttribute("do", new DigitalObject("testpid", new Resource("", "")));
+    model.addAttribute("do", new DigitalObject("testpid", "", ""));
     return "digitalObject/create";
   }
 

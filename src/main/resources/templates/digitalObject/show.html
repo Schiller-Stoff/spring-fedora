@@ -12,14 +12,14 @@
       <div class="bg-light p-2">
       
       <p><b>Pid:</b> <span th:text="${do.pid}"></span></p>
-      <p><b>Linked resource path: </b><span th:text="${do.resource.path}"></span></p>
+      <p><b>Linked resource path: </b><span th:text="${do.path}"></span></p>
     </div>
       <br/>
       <h2 class="h4">Datastreams</h2>
       <p>Displays all rdf children of digital object (via ldp:contains property)</p>
       <p></p>
       <ul class="list-group-flush">
-        <li th:each="dstreamUri : ${do.resource.children}" class="d-flex justify-content-between align-items-center list-group-item bg-light">
+        <li th:each="dstreamUri : ${do.children}" class="d-flex justify-content-between align-items-center list-group-item bg-light">
           <a style="color:black" target="_blank" th:text="${#strings.substringAfter(dstreamUri,'/datastream/')}" th:href="${dstreamUri} + '/fcr:metadata'"></a>
           <form
             onsubmit="return confirm('Are you sure you want to delete this datastream?');"
@@ -58,7 +58,7 @@
         </p>
       </form>
       <br/>
-      <p><b>Resource RDF metadata: </b><pre class="bg-light p-3"><span th:text="${do.resource.rdfXml}"></span></pre></p>
+      <p><b>Resource RDF metadata: </b><pre class="bg-light p-3"><span th:text="${do.rdfXml}"></span></pre></p>
     </main>
 
     <footer th:replace="/fragments/general.html :: footer"></footer>

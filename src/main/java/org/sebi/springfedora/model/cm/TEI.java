@@ -6,7 +6,7 @@ import org.sebi.springfedora.model.Resource;
 public class TEI extends DigitalObject {
 
   public TEI(String pid, Resource resource) {
-    super(pid, resource);
+    super(pid, "", "");
     //TODO Auto-generated constructor stub
   }
   
