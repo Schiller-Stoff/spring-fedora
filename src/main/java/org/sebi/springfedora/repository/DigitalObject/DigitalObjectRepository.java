@@ -1,10 +1,29 @@
 package org.sebi.springfedora.repository.DigitalObject;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
-import org.apache.commons.lang3.NotImplementedException;
-import org.sebi.springfedora.model.DigitalObject;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
+import org.apache.commons.lang3.NotImplementedException;
+import org.sebi.springfedora.exception.ResourceRepositoryException;
+import org.sebi.springfedora.model.DigitalObject;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Repository;
+import org.springframework.web.client.RestTemplate;
+
+import lombok.extern.slf4j.Slf4j;
+import net.minidev.json.JSONArray;
+import net.minidev.json.JSONObject;
+import net.minidev.json.parser.JSONParser;
+import net.minidev.json.parser.ParseException;
+
+@Repository
+@Slf4j
 public class DigitalObjectRepository implements IDigitalObjectRepository  {
 
   @Override
@@ -28,8 +47,45 @@ public class DigitalObjectRepository implements IDigitalObjectRepository  {
   }
 
   @Override
-  public Iterable<DigitalObject> findAll() {
-    throw new NotImplementedException("Method not implemented!");
+  public Iterable<DigitalObject> findAll() throws ResourceRepositoryException {
+    //throw new NotImplementedException("Method not implemented!");
+
+    RestTemplate restTemplate = new RestTemplate();
+    String simpleSearchEndpoint
+      = "http://localhost:8082/rest/fcr:search?condition=rdf_type=*BasicContainer*";
+    ResponseEntity<String> response
+      = restTemplate.getForEntity(simpleSearchEndpoint, String.class);
+
+    if(response.getStatusCode() != HttpStatus.OK){
+      String msg = String.format("Failed to get all objects from simple search api via url: %s. Got status code from endpoint: %s", simpleSearchEndpoint, response.getStatusCode());
+      log.error(msg);
+      throw new ResourceRepositoryException(response.getStatusCode().value(), msg);
+    }
+
+    byte[] responseBody = response.getBody().getBytes();
+
+    List<DigitalObject> digitalObjects = new ArrayList<>();
+
+    // do stuff
+    JSONParser jsonParser = new JSONParser(JSONParser.MODE_JSON_SIMPLE);
+    try {
+      JSONObject root = (JSONObject) jsonParser.parse(responseBody);
+      JSONArray items = (JSONArray) root.get("items");
+
+      items.forEach(itemObj -> {
+
+        JSONObject curitem = (JSONObject) itemObj;
+
+        digitalObjects.add(new DigitalObject((String) curitem.get("fedora_id"), (String) curitem.get("fedora_id"), ""));
+      });
+
+    } catch (ParseException e) {
+      // TODO Auto-generated catch block
+      e.printStackTrace();
+    }
+
+    return digitalObjects;
+
   }
 
   @Override
