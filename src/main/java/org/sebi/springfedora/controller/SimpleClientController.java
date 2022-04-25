@@ -2,6 +2,7 @@ package org.sebi.springfedora.controller;
 
 import java.io.IOException;
 
+import org.sebi.springfedora.exception.ResourceRepositoryException;
 import org.sebi.springfedora.model.Datastream;
 import org.sebi.springfedora.model.DigitalObject;
 import org.sebi.springfedora.model.Resource;
@@ -33,6 +34,16 @@ public class SimpleClientController {
     this.datastreamService = datastreamService;
   }
   
+
+  @GetMapping("/objects")
+  public String showAllDigitalObjects(Model model) throws ResourceRepositoryException {
+
+    DigitalObject[] digitalObjects = digitalObjectService.findAll();
+
+    model.addAttribute("dos", digitalObjects);
+
+    return "digitalObject/show_all";
+  }
 
   @GetMapping("{pid}")
   public String getObject(@PathVariable String pid, Model model ){
