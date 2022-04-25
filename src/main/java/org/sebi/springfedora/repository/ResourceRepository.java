@@ -70,7 +70,7 @@ public class ResourceRepository implements IResourceRepository<Resource> {
       log.error(msg + "\n" + e);
       throw new ResourceRepositoryException(HttpStatus.INTERNAL_SERVER_ERROR.value(), msg);
     } catch (FcrepoOperationFailedException e1) {
-      String msg = String.format("Failed to save resource with path: %s. Original message: %s", resource.getPath(), e1.getMessage());
+      String msg = String.format("Failed to save resource with path: %s. Original message: %s. For RDF: %s", resource.getPath(), e1.getMessage(), resource.getRdfXml());
       log.error(msg + "\n" + e1);
       throw new ResourceRepositoryException(e1.getStatusCode(), msg);
     } catch (Exception e){
