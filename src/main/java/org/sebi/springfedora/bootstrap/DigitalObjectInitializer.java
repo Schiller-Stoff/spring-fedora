@@ -1,6 +1,7 @@
 package org.sebi.springfedora.bootstrap;
 
 import java.util.Arrays;
+import java.util.Calendar;
 import java.util.List;
 
 import org.sebi.springfedora.exception.ResourceRepositoryException;
@@ -78,7 +79,6 @@ public class DigitalObjectInitializer implements CommandLineRunner {
       "o:prototype.gml",
       "o:prototype.mei",
       "o:prototype.context",
-      "o:prototype.tei",
       "o:prototype.query"
     );
 
@@ -117,6 +117,28 @@ public class DigitalObjectInitializer implements CommandLineRunner {
     this.createDatastream("o:derla.sty", "SOME_TEXT");
     this.createDatastream("o:derla.sty", "DEMO_TEXT");
 
+
+    /**
+     * Creation of prototypes
+     */
+ 
+    
+    String teiTurtle = "PREFIX cm4f: <http://cm4f.org/> "; 
+    teiTurtle += "<> cm4f:created \"" + Calendar.getInstance().getTime().toString() + "\"; ";
+    teiTurtle += "cm4f:owner \"sysop\"; ";
+    teiTurtle += "cm4f:rights \"644\"";
+    
+
+    this.createDigitalObject("o:prototype.tei", teiTurtle);
+
+  }
+
+  private void createDigitalObject(String pid, String turtleRdf){
+    try {
+      this.DOService.createDigitalObjectByPid(pid, turtleRdf);
+    } catch ( ResourceRepositoryException e){
+      //skip already existing
+    }
   }
 
   private void createDigitalObject(String pid){
