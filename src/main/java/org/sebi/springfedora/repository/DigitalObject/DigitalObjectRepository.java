@@ -11,6 +11,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.lang3.NotImplementedException;
 import org.sebi.springfedora.exception.ResourceRepositoryException;
 import org.sebi.springfedora.model.DigitalObject;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Repository;
@@ -25,6 +26,12 @@ import net.minidev.json.parser.ParseException;
 @Repository
 @Slf4j
 public class DigitalObjectRepository implements IDigitalObjectRepository  {
+
+  @Value("${gams.curHost}")
+  private String curHost;
+
+  @Value("${gams.fedoraRESTEndpoint}")
+  private String fedoraRESTEndpoint;
 
   @Override
   public <S extends DigitalObject> S save(S entity) {
@@ -51,8 +58,8 @@ public class DigitalObjectRepository implements IDigitalObjectRepository  {
     //throw new NotImplementedException("Method not implemented!");
 
     RestTemplate restTemplate = new RestTemplate();
-    String simpleSearchEndpoint
-      = "http://localhost:8082/rest/fcr:search?condition=rdf_type=*BasicContainer*";
+    String simpleSearchEndpoint = String.format("%s%sfcr:search?condition=rdf_type=*BasicContainer*", this.curHost, this.fedoraRESTEndpoint);
+      // "http://localhost:8082/rest/fcr:search?condition=rdf_type=*BasicContainer*";
     ResponseEntity<String> response
       = restTemplate.getForEntity(simpleSearchEndpoint, String.class);
 
@@ -61,6 +68,8 @@ public class DigitalObjectRepository implements IDigitalObjectRepository  {
       log.error(msg);
       throw new ResourceRepositoryException(response.getStatusCode().value(), msg);
     }
+
+    log.info("GET requested all digital objects from fedora6 via url: {}", simpleSearchEndpoint);
 
     byte[] responseBody = response.getBody().getBytes();
 
