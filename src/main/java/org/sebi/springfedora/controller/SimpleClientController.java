@@ -97,4 +97,10 @@ public class SimpleClientController {
     return "redirect:/client/" + pid;
   }
 
+  @DeleteMapping("/deleteObject")
+  public String deleteObject(@RequestParam String pid, Model model){
+    this.digitalObjectService.deleteDigitalObjectByPid(pid);
+    return "redirect:/client/objects";
+  } 
+
 }
