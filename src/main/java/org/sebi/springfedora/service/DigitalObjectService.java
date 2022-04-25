@@ -109,9 +109,7 @@ public class DigitalObjectService implements IDigitalObjectService {
   }
 
   @Override
-  public DigitalObject updateDatastreamByPid(String pid, String sparql) throws ResourceRepositoryException {
-
-    //URI uri = new URI("bla");
+  public DigitalObject updateMetadataByPid(String pid, String sparql) throws ResourceRepositoryException {
 
     DigitalObject digitalObject = this.findDigitalObjectByPid(pid);
 

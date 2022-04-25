@@ -15,7 +15,7 @@ public interface IDigitalObjectService {
   
   public DigitalObject deleteDigitalObjectByPid(String pid); 
 
-  public DigitalObject updateDatastreamByPid(String pid, String sparql) throws ResourceRepositoryException;
+  public DigitalObject updateMetadataByPid(String pid, String sparql) throws ResourceRepositoryException;
 
   public DigitalObject[] findAll() throws ResourceRepositoryException;
 

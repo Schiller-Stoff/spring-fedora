@@ -122,7 +122,7 @@ public class DigitalObjectInitializer implements CommandLineRunner {
      * Creation of prototypes
      */
  
-    
+    // initial rdf 
     String teiTurtle = "PREFIX cm4f: <http://cm4f.org/> "; 
     teiTurtle += "<> cm4f:created \"" + Calendar.getInstance().getTime().toString() + "\"; ";
     teiTurtle += "cm4f:owner \"sysop\"; ";
@@ -130,7 +130,7 @@ public class DigitalObjectInitializer implements CommandLineRunner {
     
 
     this.createDigitalObject("o:prototype.tei", teiTurtle);
-
+    
   }
 
   private void createDigitalObject(String pid, String turtleRdf){
