@@ -12,7 +12,7 @@
       <div class="bg-light p-2">
       
       <p><b>Pid:</b> <span th:text="${do.pid}"></span></p>
-      <p><b>Linked resource path: </b><span th:text="${do.path}"></span></p>
+      <p><b>Linked resource path: </b><a target="_blank" th:href="${do.path}" th:text="${do.path}"></a></p>
     </div>
       <br/>
       <h2 class="h4">Datastreams</h2>
