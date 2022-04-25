@@ -2,6 +2,8 @@ package org.sebi.springfedora.service;
 
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Optional;
 
 
@@ -10,6 +12,7 @@ import org.sebi.springfedora.exception.ResourceRepositoryException;
 import org.sebi.springfedora.model.DigitalObject;
 import org.sebi.springfedora.model.Resource;
 import org.sebi.springfedora.repository.IResourceRepository;
+import org.sebi.springfedora.repository.DigitalObject.IDigitalObjectRepository;
 import org.sebi.springfedora.utils.Rename;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
@@ -23,6 +26,7 @@ import lombok.extern.slf4j.Slf4j;
 public class DigitalObjectService implements IDigitalObjectService {
 	
   private IResourceRepository resourceRepository;	
+  private IDigitalObjectRepository digitalObjectRepository;
 
   @Value("${gams.curHost}")
   private String curHost;
@@ -30,9 +34,9 @@ public class DigitalObjectService implements IDigitalObjectService {
   @Value("${gams.fedoraRESTEndpoint}")
   private String fedoraRESTEndpoint;
 	
-  public DigitalObjectService(IResourceRepository resourceRepository ) {
-	  
+  public DigitalObjectService(IResourceRepository resourceRepository, IDigitalObjectRepository digitalObjectRepository ) {
     this.resourceRepository = resourceRepository;
+    this.digitalObjectRepository = digitalObjectRepository;
   }
 
   @Override
@@ -146,6 +150,15 @@ public class DigitalObjectService implements IDigitalObjectService {
     String resourcePath = curHost + fedoraRESTEndpoint + mappedPid;
 
     return resourcePath;
+  }
+
+  @Override
+  public DigitalObject[] findAll() throws ResourceRepositoryException {
+
+    ArrayList<DigitalObject> result = new ArrayList<DigitalObject>();
+    this.digitalObjectRepository.findAll().forEach(result::add);
+    return result.toArray(new DigitalObject[result.size()]);
+
   }
 
 }

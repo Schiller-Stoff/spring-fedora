@@ -17,7 +17,7 @@ public interface IDigitalObjectService {
 
   public DigitalObject updateDatastreamByPid(String pid, String sparql) throws ResourceRepositoryException;
 
-  
+  public DigitalObject[] findAll() throws ResourceRepositoryException;
 
   public boolean checkIfExists(String pid);
   
