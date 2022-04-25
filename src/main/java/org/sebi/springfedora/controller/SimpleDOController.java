@@ -19,11 +19,9 @@ import org.springframework.web.bind.annotation.RestController;
 public class SimpleDOController {
   
   private IDigitalObjectService digitalObjectService;
-  private IDigitalObjectRepository digitalObjectRepository;
   
-  public SimpleDOController(IDigitalObjectService digitalObjectService, IDigitalObjectRepository digitalObjectRepository) {
+  public SimpleDOController(IDigitalObjectService digitalObjectService) {
 	  this.digitalObjectService = digitalObjectService;
-    this.digitalObjectRepository = digitalObjectRepository;
   }
 	
 
@@ -56,8 +54,8 @@ public class SimpleDOController {
   }
 
   @GetMapping("")
-  public Iterable<DigitalObject> getAllDOs(){
-    return digitalObjectRepository.findAll();
+  public DigitalObject[] getAllDOs(){
+    return digitalObjectService.findAll();
   }
 
 }
