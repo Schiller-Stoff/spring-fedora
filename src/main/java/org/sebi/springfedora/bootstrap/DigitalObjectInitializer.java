@@ -96,38 +96,43 @@ public class DigitalObjectInitializer implements CommandLineRunner {
       "cirilo:derla",
       "cirilo:gml.derla",
       "cirilo:tei.derla",
-      "o:derla.sty",
       "cirilo:cantus",
       "cirilo:TEI.cantus",
-      "o:cantus.regensburg"
+      "o:cantus.regensburg",
+      "o:derla.sty",
+      "context:derla",
+      "o:derla.sty3",
+      "query:derla.all",
+      "corpus:derla.words"
     );
 
-    try {
-      prototypes.forEach(pid -> DOService.createDigitalObjectByPid(pid));
-      // if PUT then needs to be given as plain rdf.
-      sysObjs.forEach(pid -> DOService.createDigitalObjectByPid(pid, "PREFIX dc: <http://purl.org/dc/elements/1.1/> <> dc:title \"" + pid + "\"."));
-      digitalObjectPids.forEach(pid -> DOService.createDigitalObjectByPid(pid));
-    } catch (ResourceRepositoryException e){
-      // will throw if resource already exists.
-      // ignored here
-    }
-    
+    prototypes.forEach(pid -> this.createDigitalObject(pid));
+    sysObjs.forEach(pid -> this.createDigitalObject(pid));
+    digitalObjectPids.forEach(pid -> this.createDigitalObject(pid));
 
 
     /**
      * Creation of datastreams
      */
+    this.createDatastream("o:derla.sty", "SOME_TEXT");
+    this.createDatastream("o:derla.sty", "DEMO_TEXT");
+
+  }
+
+  private void createDigitalObject(String pid){
     try {
-      String gmlSource = "<gml>TestGml</gml>";
-      String mimetype = "application/xml";
-
-      datastreamService.createById("GML_SOURCE", mimetype, "o:derla.sty", gmlSource.getBytes());
-      datastreamService.createById("SOME_TEXT", "text/plain", "o:derla.sty", "This is text".getBytes());
-    } catch(ResourceRepositoryException e){
-      // skip already created
+      this.DOService.createDigitalObjectByPid(pid);
+    } catch ( ResourceRepositoryException e){
+      //skip already existing
     }
-    
+  }
 
+  private void createDatastream(String pid, String dsid){
+    try {
+      this.datastreamService.createById(dsid, "text/plain", pid, "demo text".getBytes());
+    } catch ( ResourceRepositoryException e){
+      //skip already existing
+    }
   }
 
 }
