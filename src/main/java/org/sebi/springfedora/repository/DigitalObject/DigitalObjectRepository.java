@@ -73,9 +73,9 @@ public class DigitalObjectRepository implements IDigitalObjectRepository  {
 
     byte[] responseBody = response.getBody().getBytes();
 
+    // from here parsing of response body and return as model = DigitalObject
     List<DigitalObject> digitalObjects = new ArrayList<>();
 
-    // do stuff
     JSONParser jsonParser = new JSONParser(JSONParser.MODE_JSON_SIMPLE);
     try {
       JSONObject root = (JSONObject) jsonParser.parse(responseBody);
@@ -89,8 +89,10 @@ public class DigitalObjectRepository implements IDigitalObjectRepository  {
       });
 
     } catch (ParseException e) {
-      // TODO Auto-generated catch block
       e.printStackTrace();
+      String msg = String.format("Failed to parse json returned from fedora at {}. Got response body: {} ", simpleSearchEndpoint, response.getBody());
+      log.error(msg);
+      throw new ResourceRepositoryException(HttpStatus.UNPROCESSABLE_ENTITY.value(), msg);
     }
 
     return digitalObjects;
