@@ -111,7 +111,7 @@ public class ResourceRepository implements IResourceRepository<Resource> {
         log.info("GET request for resource {} succesfull. Found no resource at given path. ", uri.toString());
         return Optional.empty();
       } else {
-        String msg = String.format("Failed to GET resource from fedora at uri: %s. Original resource response body: %s", uri.toString(), retrieveFedoraErrBodyMsg(response));
+        String msg = String.format("Status: %s - Failed to GET resource from fedora at uri: %s. Original resource response body: %s",response.getStatusCode(), uri.toString(), retrieveFedoraErrBodyMsg(response));
         log.error(msg);
         throw new ResourceRepositoryException(response.getStatusCode(), msg);
       }
