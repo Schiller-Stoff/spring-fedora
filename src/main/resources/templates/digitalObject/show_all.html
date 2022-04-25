@@ -24,7 +24,7 @@
             th:method="DELETE"
           >
             <input type="hidden" name="pid" th:field="*{pid}"/>
-            <input type="hidden" name="dsid" th:value="${#strings.substringAfter(dstreamUri,'/datastream/')}"/>
+            <input type="hidden" name="dsid" th:value="${#strings.substringAfter(do.path,'/datastream/')}"/>
             <input type="submit" class="btn btn-dark" value="Delete"/>
           </form> -->
         </li>
