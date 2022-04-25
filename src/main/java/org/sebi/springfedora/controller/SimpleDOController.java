@@ -58,4 +58,9 @@ public class SimpleDOController {
     return digitalObjectService.findAll();
   }
 
+  @GetMapping("{pid}/create/{protoPid}")
+  public DigitalObject cloneObject(@PathVariable String pid, @PathVariable String protoPid){
+    return digitalObjectService.createFromPrototypeByPid(pid, protoPid);
+  }
+
 }
