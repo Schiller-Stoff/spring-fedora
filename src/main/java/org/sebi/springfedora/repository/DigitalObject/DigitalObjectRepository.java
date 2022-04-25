@@ -84,8 +84,24 @@ public class DigitalObjectRepository implements IDigitalObjectRepository  {
       items.forEach(itemObj -> {
 
         JSONObject curitem = (JSONObject) itemObj;
+        String fedoraId = (String) curitem.get("fedora_id");
+        
+        // needed to correctly construct pid out of fedora6 path
+        if(fedoraId.contains("/objects/")){
+          String pid = String.format("o:%s", fedoraId.split("/objects/")[1]);
+          digitalObjects.add(new DigitalObject(pid, fedoraId, ""));
+        } else if(fedoraId.contains("/aggregations/context/")){
+          String pid = String.format("context:%s", fedoraId.split("/aggregations/context/")[1]);
+          digitalObjects.add(new DigitalObject(pid, fedoraId, ""));
+        } else if(fedoraId.contains("/aggregations/query/")){
+          String pid = String.format("query:%s", fedoraId.split("/aggregations/query/")[1]);
+          digitalObjects.add(new DigitalObject(pid, fedoraId, ""));
+        } else if(fedoraId.contains("/aggregations/corpus/")){
+          String pid = String.format("corpus:%s", fedoraId.split("/aggregations/corpus/")[1]);
+          digitalObjects.add(new DigitalObject(pid, fedoraId, ""));
+        }
 
-        digitalObjects.add(new DigitalObject((String) curitem.get("fedora_id"), (String) curitem.get("fedora_id"), ""));
+        
       });
 
     } catch (ParseException e) {
