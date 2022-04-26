@@ -129,7 +129,8 @@ public class DigitalObjectInitializer implements CommandLineRunner {
     teiTurtle += "cm4f:rights \"644\"";
     
 
-    //this.createDigitalObject("o:prototype.tei", teiTurtle);
+    // this.createDigitalObject("o:prototype.tei", teiTurtle);
+    this.createDigitalObject("o:prototype.tei");
     
   }
 
