@@ -25,6 +25,7 @@ import org.sebi.springfedora.model.DigitalObject;
 import org.sebi.springfedora.model.Resource;
 import org.sebi.springfedora.repository.IResourceRepository;
 import org.sebi.springfedora.repository.DigitalObject.IDigitalObjectRepository;
+import org.sebi.springfedora.repository.utils.FedoraUtils;
 import org.sebi.springfedora.utils.DOResourceMapper;
 import org.sebi.springfedora.utils.Rename;
 import org.springframework.beans.factory.annotation.Value;
@@ -171,90 +172,29 @@ public class DigitalObjectService implements IDigitalObjectService {
 
     DigitalObject prototype = this.findDigitalObjectByPid(protoPid);
 
+
+    // replace pid in rdf
     String clonedRdf = prototype.getRdfXml();
-
-
     String mappedProtoPath = doResourceMapper.mapObjectResourcePath(protoPid);
     String mappedDOPath = doResourceMapper.mapObjectResourcePath(pid);
 
     log.info("Request against protoype {} succesfully. Replacing now {} through {}", protoPid, mappedProtoPath, mappedDOPath);
 
-    // replacements for prototype
     clonedRdf = clonedRdf.replaceAll(mappedProtoPath, mappedDOPath);
     
-
     /**
      * From here processing + building of xml based RDF.
+     * (remove system triples)
      */
-
     try {
-      DocumentBuilder builder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
-      Document doc = builder.parse(IOUtils.toInputStream(clonedRdf, "utf-8"));
-
-      doc.getDocumentElement().normalize();
-
-      Node rdfDescription = doc.getElementsByTagName("rdf:Description").item(0);
-
-      NodeList children = rdfDescription.getChildNodes();
-
-
-      String[] forbiddenURIs = {"http://fedora.info/definitions/v4/repository#Resource", "http://www.w3.org/ns/ldp#BasicContainer", "http://www.w3.org/ns/ldp#Resource", "http://www.w3.org/ns/ldp#RDFSource","http://www.w3.org/ns/ldp#Container","http://fedora.info/definitions/v4/repository#Container"};
-
-      for (int i = 0; i < children.getLength(); i++){
-        Node child = children.item(i);
-        
-        if(child.getNodeName() == "#text")continue;
-
-        log.debug(child.getNodeName());
-        if(child.getNodeName().contains("fedora:")) {
-          rdfDescription.removeChild(child);
-          continue;
-        };
-
-        if(child.getNodeName() == "rdf:type"){
-
-          String curVal = child.getAttributes().getNamedItem("rdf:resource").getNodeValue();
-
-         if(Arrays.asList(forbiddenURIs).contains(curVal)) rdfDescription.removeChild(child);
-
-
-        }
-        
-      }
-
-      log.info("Succesfully removed system properties from requested prototype digital object {} for {} Trying to send xml: {}", protoPid, pid, documentToString(doc));
-      return this.createDigitalObjectByPid(pid, documentToString(doc));
-
-    } catch (SAXException | IOException | ParserConfigurationException e) {
+      String craftedRdf = FedoraUtils.cloneResourceMetadata(clonedRdf);
+      return this.createDigitalObjectByPid(pid, craftedRdf);
+    } catch(SAXException | IOException | ParserConfigurationException e){
       String msg = String.format("Failed to process xml from prototype %s for digital object %s. Starting from prototype rdf metadata: %s", protoPid, pid, clonedRdf);
       log.error(msg + "\n" + e);
       throw new ResourceRepositoryException(HttpStatus.INTERNAL_SERVER_ERROR.value(), msg);
-    } 
-    
-
-
-    
-
-    //return this.createDigitalObjectByPid(pid, clonedRdf);
+    }
     
   }
-
-
-  public static String documentToString(Document doc) {
-    try {
-        StringWriter sw = new StringWriter();
-        TransformerFactory tf = TransformerFactory.newInstance();
-        Transformer transformer = tf.newTransformer();
-        transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "no");
-        transformer.setOutputProperty(OutputKeys.METHOD, "xml");
-        transformer.setOutputProperty(OutputKeys.INDENT, "yes");
-        transformer.setOutputProperty(OutputKeys.ENCODING, "UTF-8");
-
-        transformer.transform(new DOMSource(doc), new StreamResult(sw));
-        return sw.toString();
-    } catch (Exception ex) {
-        throw new RuntimeException("Error converting to String", ex);
-    }
-}
 
 }
