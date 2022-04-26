@@ -51,7 +51,7 @@ public class DatastreamService implements IDatastreamService  {
 
     // throw if already exists
     if(datastreamRepository.existsById(path)){
-      String msg = String.format("Creation of datastream with id %s at path %s failed. Found and already existing resource. Tried mimetype: %s", id, path, mimetype);
+      String msg = String.format("Creation of datastream with id %s at path %s failed. Found an already existing resource. Tried mimetype: %s", id, path, mimetype);
       log.error(msg);
       throw new ResourceRepositoryException(HttpStatus.CONFLICT.value(), msg);
     }
