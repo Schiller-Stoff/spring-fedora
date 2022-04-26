@@ -1,9 +1,13 @@
 package org.sebi.springfedora.bootstrap;
 
+import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.List;
 
+import org.apache.commons.io.FileUtils;
 import org.sebi.springfedora.Common;
 import org.sebi.springfedora.exception.ResourceRepositoryException;
 import org.sebi.springfedora.model.Datastream;
@@ -122,7 +126,7 @@ public class DigitalObjectInitializer implements CommandLineRunner {
     /**
      * Creation of prototypes
      */
- 
+
     this.createDigitalObject("o:prototype.tei");
 
     String propertiesToBeAdded = "cm4f:owner 'sysop'; cm4f:created 'now'";
@@ -130,7 +134,29 @@ public class DigitalObjectInitializer implements CommandLineRunner {
 
 
     this.DOService.updateMetadataByPid("o:prototype.tei", sparqlUpdate);
+
+    String teiSourcePath = "C:\\Users\\stoffse\\Documents\\programming\\java\\spring-fedora\\data\\models\\tei\\TEI_SOURCE.xml";
     
+    
+
+    try {
+      byte[] data = FileUtils.readFileToByteArray(new File(teiSourcePath));
+      
+      this.datastreamService.createById(
+        "TEI_SOURCE",
+        "application/xml", 
+        "o:prototype.tei", 
+        data
+      );
+      
+    } catch (IOException e) {
+      // TODO Auto-generated catch block
+      e.printStackTrace();
+    } catch (ResourceRepositoryException e2){
+      
+    }
+
+
   }
 
   private void createDigitalObject(String pid, String rdfXml){
