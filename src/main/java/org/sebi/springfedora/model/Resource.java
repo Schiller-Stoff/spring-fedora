@@ -1,5 +1,6 @@
 package org.sebi.springfedora.model;
 
+import org.springframework.lang.Nullable;
 import org.springframework.util.MimeType;
 
 import lombok.AllArgsConstructor;
@@ -16,6 +17,7 @@ public class Resource {
     private String path;
 
     // RDF info from resource  
+    @Nullable
     private String rdfXml;
 
     // ldp:contains of resource

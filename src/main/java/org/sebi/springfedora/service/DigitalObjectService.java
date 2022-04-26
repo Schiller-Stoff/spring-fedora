@@ -20,6 +20,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.util.MimeType;
 
+import io.micrometer.core.lang.Nullable;
 import lombok.extern.slf4j.Slf4j;
 
 @Service
@@ -45,26 +46,25 @@ public class DigitalObjectService implements IDigitalObjectService {
 
   @Override
   public DigitalObject createDigitalObjectByPid(String pid) throws ResourceRepositoryException {
-    return this.createDigitalObjectByPid(pid, "");
+    return this.createDigitalObjectByPid(pid, null);
   }
 
   @Override
-  public DigitalObject createDigitalObjectByPid(String pid, String rdf) throws ResourceRepositoryException {
-    String mappedFedora6Path = this.mapPidToResourcePath(pid);
-  
-    String resourcePath = "http://localhost:8082/rest/" + mappedFedora6Path; 
+  public DigitalObject createDigitalObjectByPid(String pid, @Nullable String rdf) throws ResourceRepositoryException {
+    
+    String resourcePath = doResourceMapper.mapObjectResourcePath(pid); 
 
     // check if resource already exists
-    if(resourceRepository.existsById(resourcePath)) {
+    if(this.checkIfExists(pid)) {
       String msg = String.format("Creation of object failed. Resource already exists for object with pid: %s . Found existing resource path: %s", pid, resourcePath);
       throw new ResourceRepositoryException(HttpStatus.CONFLICT.value(), msg);
     }
 
-    Resource resource = new Resource(resourcePath, rdf);
+    DigitalObject digitalObject = new DigitalObject(pid, resourcePath, rdf);
 
-    this.resourceRepository.save(resource);
-    
-    return new DigitalObject(pid, resourcePath, rdf);
+    log.info("Trying to save now digital object with pid: {} - at path: {} - with rdf: {}", pid, resourcePath, rdf);
+    this.digitalObjectRepository.save(digitalObject);
+    return digitalObject;
   }
 
   @Override
@@ -75,30 +75,18 @@ public class DigitalObjectService implements IDigitalObjectService {
     // getting the Resource
     // need to be returned as DigitalObject / DataStream?
 
-    final String PROTOCOL = "http://";
-    final String HOST_NAME = "localhost";
-    final String PORT = "8082";
-    final String FC_REPO_REST = "/rest";
 
-    String mappedPath = Rename.rename(pid);
-
-
-    String uri = PROTOCOL + HOST_NAME + ":" + PORT + FC_REPO_REST + "/" + mappedPath;
-    Optional<Resource> optional =  resourceRepository.findById(uri);
+    Optional<DigitalObject> optional =  digitalObjectRepository.findById(pid);
     
-
     if(optional.isPresent()){
-      Resource resource = optional.orElseThrow();
-      DigitalObject digitalObject = new DigitalObject(pid, resource.getPath(), resource.getRdfXml(), resource.getChildren());
-      log.info("Found digital object with pid: {}. Related resource path: {}", pid, resource.getPath());
-      return digitalObject;
+      log.info("Found digital object with pid: {}", pid);
+      return optional.get();
     } else {
-      String msg = String.format("Couldn't find object with pid %s . Tried to GET from ResourceRepository path: %s", pid, uri);
+      String msg = String.format("Couldn't find object with pid %s . Tried to GET from ResourceRepository path: %s", pid);
       log.error(msg);
       throw new ResourceRepositoryException(HttpStatus.NOT_FOUND.value(), msg);
     }
 
-    
   }
 
   @Override
@@ -127,9 +115,8 @@ public class DigitalObjectService implements IDigitalObjectService {
    * (If for the pid exists a resource with mapped resource path)
    */
   @Override
-  public boolean checkIfExists(String pid){
-    String resourcePath = this.mapObjectResourcePath(pid);
-    return resourceRepository.existsById(resourcePath);
+  public boolean checkIfExists(String pid) throws ResourceRepositoryException {
+    return digitalObjectRepository.existsById(pid);
   }
 
   /**

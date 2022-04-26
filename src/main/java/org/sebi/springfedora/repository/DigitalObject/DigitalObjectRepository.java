@@ -63,20 +63,19 @@ public class DigitalObjectRepository implements IDigitalObjectRepository  {
   public <S extends DigitalObject> S save(S digitalObject) {
     URI uri =  RepositoryUtils.parseToURI(digitalObject.getPath());
 
-    // TODO add more
-    // POST given resource to Fedora
-    // String rdf = resource.getRdfXml();
+    // rdf might be null
+    // need to use mimetype text/turtle if just the resource should be created
+    String triples = digitalObject.getRdfXml() != null ? digitalObject.getRdfXml() : "";
+    String curMimetype =  digitalObject.getRdfXml() != null ? "application/rdf+xml" : "text/turtle";
 
-    // String triples = resource.getRdfXml() != "" ? Common.ADDRDFPROPERTY.replace("$1", resource.getRdfXml()) : "";
-    String triples = digitalObject.getRdfXml();
-    InputStream triplesIStream = IOUtils.toInputStream(digitalObject.getRdfXml(), "utf-8");
+    InputStream triplesIStream = IOUtils.toInputStream(triples, "utf-8");
 
-    log.info("Initiating post request for: {}. With rdf: {}", digitalObject.getPath(), triples);
+    log.info("Initiating PUT request for: {}. With rdf: {}", digitalObject.getPath(), triples);
 
     try (
       final FcrepoClient client = FcrepoClient.client().build();
       FcrepoResponse response = new PutBuilder(uri, client)
-          .body( triplesIStream, "application/xml+rdf")
+          .body( triplesIStream, curMimetype)
           //.slug(uri.toString())
           .perform()
     ) {
@@ -156,8 +155,8 @@ public class DigitalObjectRepository implements IDigitalObjectRepository  {
   }
 
   @Override
-  public boolean existsById(String id) {
-    throw new NotImplementedException("Method not implemented!");
+  public boolean existsById(String pid) throws ResourceRepositoryException {
+    return !this.findById(pid).isEmpty();
   }
 
   @Override
