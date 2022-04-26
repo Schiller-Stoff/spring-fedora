@@ -25,7 +25,7 @@ import org.sebi.springfedora.model.DigitalObject;
 import org.sebi.springfedora.model.Resource;
 import org.sebi.springfedora.repository.IResourceRepository;
 import org.sebi.springfedora.repository.DigitalObject.IDigitalObjectRepository;
-import org.sebi.springfedora.repository.utils.FedoraUtils;
+import org.sebi.springfedora.repository.utils.FedoraMetadata;
 import org.sebi.springfedora.utils.DOResourceMapper;
 import org.sebi.springfedora.utils.Rename;
 import org.springframework.beans.factory.annotation.Value;
@@ -175,20 +175,22 @@ public class DigitalObjectService implements IDigitalObjectService {
 
     // replace pid in rdf
     String clonedRdf = prototype.getRdfXml();
-    String mappedProtoPath = doResourceMapper.mapObjectResourcePath(protoPid);
     String mappedDOPath = doResourceMapper.mapObjectResourcePath(pid);
 
-    log.info("Request against protoype {} succesfully. Replacing now {} through {}", protoPid, mappedProtoPath, mappedDOPath);
-
-    clonedRdf = clonedRdf.replaceAll(mappedProtoPath, mappedDOPath);
+    log.info("Request against protoype {} succesfully for creation of object with pid {}", protoPid, mappedDOPath);
     
     /**
      * From here processing + building of xml based RDF.
      * (remove system triples)
      */
     try {
-      String craftedRdf = FedoraUtils.cloneResourceMetadata(clonedRdf);
-      return this.createDigitalObjectByPid(pid, craftedRdf);
+      FedoraMetadata newMetadata = new FedoraMetadata(clonedRdf)
+        .removeFedoraSystemTriples()
+        .replaceResourcePath(mappedDOPath);
+
+      String newRdf = newMetadata.serializeToString();
+      return this.createDigitalObjectByPid(pid, newRdf);
+
     } catch(SAXException | IOException | ParserConfigurationException e){
       String msg = String.format("Failed to process xml from prototype %s for digital object %s. Starting from prototype rdf metadata: %s", protoPid, pid, clonedRdf);
       log.error(msg + "\n" + e);
