@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+  <rdf:Description xmlns:xsl="http://cm4f.org/xsl/"
+    xmlns:rel="info:fedora/fedora-system:def/relations-external#"
+    xmlns:model="info:fedora/fedora-system:def/model#" xmlns:dc="http://purl.org/dc/elements/1.1/"
+    xmlns:oai="http://www.openarchives.org/OAI/2.0/" xmlns:cm4f="http://cm4f.org/"
+    rdf:about="info:fedora/o:prototype.tei">
+    <dc:title>TEI object prototype</dc:title>
+    <dc:identifier>o:prototype.tei</dc:identifier>
+    <dc:type>CompoundObject</dc:type>
+    <dc:relation>http://cm4f.org</dc:relation>
+    <model:hasModel rdf:resource="info:fedora/cm:TEI"/>
+    <rdf:type rdf:resource="http://cm4f.org/Prototype"/>
+    <xsl:hasXsltToDefaultView rdf:resource="http://apache:82/xsl/dc2html.xsl"/>
+    <xsl:hasXsltToDC rdf:resource="http://apache:82/xsl/tei2dc.xsl"/>
+    <xsl:hasXsltToHTML rdf:resource="http://apache:82/tei/html/html.xsl"/>
+    <xsl:hasXsltToFO rdf:resource="http://apache:82/tei/fo/fo.xsl"/>
+    <xsl:hasXsltToLATEX rdf:resource="http://apache:82/tei/latex/latex.xsl"/>
+    <xsl:hasXsltBibTeXToHTML rdf:resource="http://apache:82/xsl/bibtex2html.xsl"/>
+    <xsl:hasXsltBibTeXToFO rdf:resource="http://apache:82/xsl/bibtex2fo.xsl"/>
+    <xsl:hasXsltToHSSF rdf:resource="http://apache:82/xsl/tei2hssf.xsl"/>
+    <xsl:hasXsltToRDF_Triples rdf:resource="http://apache:82/xsl/tei2rdf.xsl"/>
+    <xsl:hasXsltToXML_Snippet rdf:resource="http://apache:82/xsl/tei2snippet.xsl"/>
+    <xsl:hasXsltToR_Dataset rdf:resource="http://apache:82/xsl/tei2dataset.xsl"/>
+    <xsl:hasXsltToMETS rdf:resource="http://apache:82/xsl/tei2mets.xsl"/>
+    <xsl:hasXsltForCustomization rdf:resource="http://apache:82/xsl/customization4tei.xsl"/>
+  </rdf:Description>
+</rdf:RDF>
