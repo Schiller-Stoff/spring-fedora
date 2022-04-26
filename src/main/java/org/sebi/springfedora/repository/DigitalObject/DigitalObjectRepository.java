@@ -1,6 +1,7 @@
 package org.sebi.springfedora.repository.DigitalObject;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
@@ -59,8 +60,55 @@ public class DigitalObjectRepository implements IDigitalObjectRepository  {
   }
 
   @Override
-  public <S extends DigitalObject> S save(S entity) {
-    throw new NotImplementedException("Method not implemented!");
+  public <S extends DigitalObject> S save(S digitalObject) {
+    URI uri =  RepositoryUtils.parseToURI(digitalObject.getPath());
+
+    // TODO add more
+    // POST given resource to Fedora
+    // String rdf = resource.getRdfXml();
+
+    // String triples = resource.getRdfXml() != "" ? Common.ADDRDFPROPERTY.replace("$1", resource.getRdfXml()) : "";
+    String triples = digitalObject.getRdfXml();
+    InputStream triplesIStream = IOUtils.toInputStream(digitalObject.getRdfXml(), "utf-8");
+
+    log.info("Initiating post request for: {}. With rdf: {}", digitalObject.getPath(), triples);
+
+    try (
+      final FcrepoClient client = FcrepoClient.client().build();
+      FcrepoResponse response = new PutBuilder(uri, client)
+          .body( triplesIStream, "application/xml+rdf")
+          //.slug(uri.toString())
+          .perform()
+    ) {
+
+      if(response.getStatusCode() == 201 ){
+        log.info("Succesfully saved digital object {} with path: {} ", digitalObject.getPid(), digitalObject.getPath());
+        return digitalObject;
+      } else if (response.getStatusCode() == 204){
+        log.info("Succesfully saved digital object {} with path: {}. Without content", digitalObject.getPid(), digitalObject.getPath());
+        return digitalObject;
+      } else {
+        String msg = String.format("Failed to save digital object %s with path: %s. Original message: %s",digitalObject.getPid(), digitalObject.getPath(), resourceRepository.retrieveFedoraErrBodyMsg(response));
+        log.error(msg);
+        throw new ResourceRepositoryException(response.getStatusCode(), msg);
+      }
+      
+    } catch (IOException e) {
+      String msg = String.format("Failed to save digital object %s with path: %s. Original message: %s", digitalObject.getPid(), digitalObject.getPath(), e.getMessage());
+      log.error(msg + "\n" + e);
+      throw new ResourceRepositoryException(HttpStatus.INTERNAL_SERVER_ERROR.value(), msg);
+    } catch (FcrepoOperationFailedException e1) {
+      String msg = String.format("Failed to save digital object %s with path: %s. Original message: %s. For RDF: %s", digitalObject.getPid(), digitalObject.getPath(), e1.getMessage(), digitalObject.getRdfXml());
+      log.error(msg + "\n" + e1);
+      throw new ResourceRepositoryException(e1.getStatusCode(), msg);
+    } catch (Exception e){
+      // pass through thrown if status codes are 400+ from above
+      if(e instanceof ResourceRepositoryException) throw e;
+      
+      String msg = String.format("Failed to save digital object %s with path %s. Original message: ", digitalObject.getPid(), digitalObject.getPath(), e.getMessage());
+      log.error(msg + "\n" + e);
+      throw new ResourceRepositoryException(HttpStatus.INTERNAL_SERVER_ERROR.value(), msg);
+    }
   }
 
   @Override
