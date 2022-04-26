@@ -4,6 +4,7 @@ import java.util.Arrays;
 import java.util.Calendar;
 import java.util.List;
 
+import org.sebi.springfedora.Common;
 import org.sebi.springfedora.exception.ResourceRepositoryException;
 import org.sebi.springfedora.model.Datastream;
 import org.sebi.springfedora.model.Resource;
@@ -122,21 +123,19 @@ public class DigitalObjectInitializer implements CommandLineRunner {
      * Creation of prototypes
      */
  
-    // initial rdf 
-    String teiTurtle = "PREFIX cm4f: <http://cm4f.org/> "; 
-    teiTurtle += "<> cm4f:created \"" + Calendar.getInstance().getTime().toString() + "\"; ";
-    teiTurtle += "cm4f:owner \"sysop\"; ";
-    teiTurtle += "cm4f:rights \"644\"";
-    
-
-    // this.createDigitalObject("o:prototype.tei", teiTurtle);
     this.createDigitalObject("o:prototype.tei");
+
+    String propertiesToBeAdded = "cm4f:owner 'sysop'; cm4f:created 'now'";
+    String sparqlUpdate = Common.ADDRDFPROPERTY.replace("$1", propertiesToBeAdded);
+
+
+    this.DOService.updateMetadataByPid("o:prototype.tei", sparqlUpdate);
     
   }
 
-  private void createDigitalObject(String pid, String turtleRdf){
+  private void createDigitalObject(String pid, String rdfXml){
     try {
-      this.DOService.createDigitalObjectByPid(pid, turtleRdf);
+      this.DOService.createDigitalObjectByPid(pid, rdfXml);
     } catch ( ResourceRepositoryException e){
       //skip already existing
     }
