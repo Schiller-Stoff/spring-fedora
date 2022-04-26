@@ -288,7 +288,7 @@ public class ResourceRepository implements IResourceRepository<Resource> {
    * @return parsed resource's URI.
    * @throws ResourceRepositoryException
    */
-  private URI retrieveResourceURI(Resource resource) throws ResourceRepositoryException {
+  public URI retrieveResourceURI(Resource resource) throws ResourceRepositoryException {
     URI uri = null;
     try {
       uri = new URI(resource.getPath());
