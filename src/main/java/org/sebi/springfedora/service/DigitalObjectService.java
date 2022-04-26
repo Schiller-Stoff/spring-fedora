@@ -6,13 +6,14 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Optional;
 
-
+import org.apache.commons.lang3.NotImplementedException;
 import org.fcrepo.client.FcrepoOperationFailedException;
 import org.sebi.springfedora.exception.ResourceRepositoryException;
 import org.sebi.springfedora.model.DigitalObject;
 import org.sebi.springfedora.model.Resource;
 import org.sebi.springfedora.repository.IResourceRepository;
 import org.sebi.springfedora.repository.DigitalObject.IDigitalObjectRepository;
+import org.sebi.springfedora.utils.DOResourceMapper;
 import org.sebi.springfedora.utils.Rename;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
@@ -28,15 +29,18 @@ public class DigitalObjectService implements IDigitalObjectService {
   private IResourceRepository resourceRepository;	
   private IDigitalObjectRepository digitalObjectRepository;
 
+  private DOResourceMapper doResourceMapper;
+
   @Value("${gams.curHost}")
   private String curHost;
 
   @Value("${gams.fedoraRESTEndpoint}")
   private String fedoraRESTEndpoint;
 	
-  public DigitalObjectService(IResourceRepository resourceRepository, IDigitalObjectRepository digitalObjectRepository ) {
+  public DigitalObjectService(IResourceRepository resourceRepository, IDigitalObjectRepository digitalObjectRepository, DOResourceMapper doResourceMapper ) {
     this.resourceRepository = resourceRepository;
     this.digitalObjectRepository = digitalObjectRepository;
+    this.doResourceMapper = doResourceMapper;
   }
 
   @Override
@@ -157,6 +161,33 @@ public class DigitalObjectService implements IDigitalObjectService {
     this.digitalObjectRepository.findAll().forEach(result::add);
     return result.toArray(new DigitalObject[result.size()]);
 
+  }
+
+  @Override
+  public DigitalObject createFromPrototypeByPid(String pid, String protoPid) throws ResourceRepositoryException {
+
+    DigitalObject prototype = this.findDigitalObjectByPid(protoPid);
+
+    String clonedRdf = prototype.getRdfXml();
+
+
+    String mappedProtoPath = doResourceMapper.mapObjectResourcePath(protoPid);
+    String mappedDOPath = doResourceMapper.mapObjectResourcePath(pid);
+
+    log.info("Request against protoype {} succesfull. Replacing now {} through {}", protoPid, mappedProtoPath, mappedDOPath);
+
+    // replacements for prototype
+    //clonedRdf = clonedRdf.replaceAll(mappedProtoPath, mappedDOPath);
+    clonedRdf = clonedRdf.replaceAll("rdf:about=\"" + mappedProtoPath + "\" ", "");
+
+
+    // problem here is: endpoint only accepts specific mimetype
+    // (java optional parameters?)
+
+    throw new NotImplementedException();
+
+    //return this.createDigitalObjectByPid(pid, clonedRdf);
+    
   }
 
 }
