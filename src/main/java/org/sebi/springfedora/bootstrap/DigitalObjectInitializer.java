@@ -1,25 +1,19 @@
 package org.sebi.springfedora.bootstrap;
 
 import java.io.File;
-import java.io.FileReader;
 import java.io.IOException;
 import java.util.Arrays;
-import java.util.Calendar;
 import java.util.List;
 
 import org.apache.commons.io.FileUtils;
 import org.sebi.springfedora.Common;
 import org.sebi.springfedora.exception.ResourceRepositoryException;
-import org.sebi.springfedora.model.Datastream;
 import org.sebi.springfedora.model.Resource;
 import org.sebi.springfedora.repository.IResourceRepository;
 import org.sebi.springfedora.service.IDatastreamService;
 import org.sebi.springfedora.service.IDigitalObjectService;
 import org.springframework.boot.CommandLineRunner;
-import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
-import org.springframework.util.MimeType;
-import org.springframework.web.multipart.MultipartFile;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -119,12 +113,13 @@ public class DigitalObjectInitializer implements CommandLineRunner {
     /**
      * Creation of datastreams
      */
-    this.createDatastream("o:derla.sty", "SOME_TEXT");
-    this.createDatastream("o:derla.sty", "DEMO_TEXT");
-
+    this.createDatastream("SOME_TEXT", "text/plain", "o:derla.sty", "example text".getBytes());
+    this.createDatastream("DEMO_TEXT", "text/plain", "o:derla.sty", "demo text".getBytes());
+    
 
     /**
      * Creation of prototypes
+     * (in case of TEI)
      */
 
     this.createDigitalObject("o:prototype.tei");
@@ -132,30 +127,25 @@ public class DigitalObjectInitializer implements CommandLineRunner {
     String propertiesToBeAdded = "cm4f:owner 'sysop'; cm4f:created 'now'";
     String sparqlUpdate = Common.ADDRDFPROPERTY.replace("$1", propertiesToBeAdded);
 
-
     this.DOService.updateMetadataByPid("o:prototype.tei", sparqlUpdate);
 
-    String teiSourcePath = "C:\\Users\\stoffse\\Documents\\programming\\java\\spring-fedora\\data\\models\\tei\\TEI_SOURCE.xml";
-    
-    
+    String teiBasePath = "C:\\Users\\stoffse\\Documents\\programming\\java\\spring-fedora\\data\\models\\tei\\";
 
-    try {
-      byte[] data = FileUtils.readFileToByteArray(new File(teiSourcePath));
-      
-      this.datastreamService.createById(
-        "TEI_SOURCE",
-        "application/xml", 
-        "o:prototype.tei", 
-        data
-      );
-      
-    } catch (IOException e) {
-      // TODO Auto-generated catch block
-      e.printStackTrace();
-    } catch (ResourceRepositoryException e2){
-      
-    }
+    //TEI SOURCE
+    createDatastreamFromFile(
+      "TEI_SOURCE", 
+      "application/xml", 
+      "o:prototype.tei", 
+      teiBasePath + "TEI_SOURCE.xml"
+    );
 
+    // Dublin Core
+    createDatastreamFromFile(
+      "DC", 
+      "application/xml", 
+      "o:prototype.tei", 
+      teiBasePath + "DC.xml"
+    );
 
   }
 
@@ -175,11 +165,21 @@ public class DigitalObjectInitializer implements CommandLineRunner {
     }
   }
 
-  private void createDatastream(String pid, String dsid){
+  private void createDatastream(String dsid, String mimetype, String pid, byte[] content){
     try {
-      this.datastreamService.createById(dsid, "text/plain", pid, "demo text".getBytes());
+      this.datastreamService.createById(dsid, mimetype, pid, content);
     } catch ( ResourceRepositoryException e){
       //skip already existing
+    }
+  }
+
+  private void createDatastreamFromFile(String dsid, String mimetype, String pid, String filePath){
+    try {
+      byte[] content = FileUtils.readFileToByteArray(new File(filePath));
+      this.createDatastream(dsid, mimetype, pid, content);
+    } catch (IOException e) {
+      // TODO Auto-generated catch block
+      e.printStackTrace();
     }
   }
 
