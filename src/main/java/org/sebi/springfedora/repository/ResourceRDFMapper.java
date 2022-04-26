@@ -19,7 +19,7 @@ import org.xml.sax.SAXException;
 
 public class ResourceRDFMapper {
 
-  public static String[] parseRDFChildren(String fedoraResourceXml) {
+  public static String[] parseRDFChildren(String fedoraResourceXml) throws ResourceRepositoryException {
 
     List<String> ldpChildren = new ArrayList<>();
 
