@@ -1,5 +1,7 @@
 package org.sebi.springfedora.repository.DigitalObject;
 
+import java.io.IOException;
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -8,14 +10,28 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.NotImplementedException;
+import org.fcrepo.client.FcrepoClient;
 import org.sebi.springfedora.exception.ResourceRepositoryException;
 import org.sebi.springfedora.model.DigitalObject;
+import org.sebi.springfedora.model.Resource;
+import org.sebi.springfedora.repository.IResourceRepository;
+import org.sebi.springfedora.repository.ResourceRDFMapper;
+import org.sebi.springfedora.repository.utils.RepositoryUtils;
+import org.sebi.springfedora.utils.DOResourceMapper;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Repository;
 import org.springframework.web.client.RestTemplate;
+
+import org.fcrepo.client.DeleteBuilder;
+import org.fcrepo.client.FcrepoOperationFailedException;
+import org.fcrepo.client.FcrepoResponse;
+import org.fcrepo.client.GetBuilder;
+import org.fcrepo.client.PatchBuilder;
+import org.fcrepo.client.PutBuilder;
 
 import lombok.extern.slf4j.Slf4j;
 import net.minidev.json.JSONArray;
@@ -33,6 +49,15 @@ public class DigitalObjectRepository implements IDigitalObjectRepository  {
   @Value("${gams.fedoraRESTEndpoint}")
   private String fedoraRESTEndpoint;
 
+  private IResourceRepository resourceRepository;
+
+  private DOResourceMapper doResourceMapper;
+
+  public DigitalObjectRepository(IResourceRepository resourceRepository, DOResourceMapper doResourceMapper){
+    this.resourceRepository = resourceRepository;
+    this.doResourceMapper = doResourceMapper;
+  }
+
   @Override
   public <S extends DigitalObject> S save(S entity) {
     throw new NotImplementedException("Method not implemented!");
@@ -44,8 +69,42 @@ public class DigitalObjectRepository implements IDigitalObjectRepository  {
   }
 
   @Override
-  public Optional<DigitalObject> findById(String id) {
-    throw new NotImplementedException("Method not implemented!");
+  public Optional<DigitalObject> findById(String pid) {
+    
+    String mappedResourcePath = doResourceMapper.mapObjectResourcePath(pid);
+    URI uri = RepositoryUtils.parseToURI(mappedResourcePath);
+
+    try (
+        final FcrepoClient client = FcrepoClient.client().build();
+        FcrepoResponse response = new GetBuilder(uri, client)
+            .accept("application/rdf+xml")
+            .perform()
+        ) {
+
+      if(response.getStatusCode() == 200){
+        String turtleContent = IOUtils.toString(response.getBody(), "UTF-8");
+        String[] datastreams = ResourceRDFMapper.parseRDFChildren(turtleContent);
+        DigitalObject digitalObject = new DigitalObject(pid, mappedResourcePath,turtleContent, datastreams);
+        log.info("Found digital object with pid {} and path {} inside fedora",digitalObject.getPid(), digitalObject.getPath());
+        return Optional.of(digitalObject);
+      } else if(response.getStatusCode() == 404) {
+        log.info("GET request for digital object {} succesfull. Found no resource at given path {}. ",pid, uri.toString());
+        return Optional.empty();
+      } else {
+        String msg = String.format("Failed to GET digital object with pid {} from fedora at uri: %s. Original resource response body: %s", pid, uri.toString(), resourceRepository.retrieveFedoraErrBodyMsg(response));
+        log.error(msg);
+        throw new ResourceRepositoryException(response.getStatusCode(), msg);
+      }
+
+    } catch (IOException e) {
+      String msg = String.format("GET request for digital object {} with path: %s failed. Original err msg: %s",pid , mappedResourcePath, e.getMessage());
+      log.error(msg + "\n" + e);
+      throw new ResourceRepositoryException(HttpStatus.INTERNAL_SERVER_ERROR.value(), msg);
+    } catch (FcrepoOperationFailedException e1) {
+      String msg = String.format("GET request for digital object {} with path: %s failed. Original err msg: %s",pid , mappedResourcePath, e1.getMessage());
+      log.error(msg + "\n" + e1);
+      throw new ResourceRepositoryException(e1.getStatusCode(), msg);
+    }
   }
 
   @Override
