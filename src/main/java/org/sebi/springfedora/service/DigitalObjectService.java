@@ -1,11 +1,23 @@
 package org.sebi.springfedora.service;
 
+import java.io.IOException;
+import java.io.StringWriter;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Optional;
 
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.OutputKeys;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
+
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.NotImplementedException;
 import org.fcrepo.client.FcrepoOperationFailedException;
 import org.sebi.springfedora.exception.ResourceRepositoryException;
@@ -19,6 +31,10 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.util.MimeType;
+import org.w3c.dom.Document;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+import org.xml.sax.SAXException;
 
 import io.micrometer.core.lang.Nullable;
 import lombok.extern.slf4j.Slf4j;
@@ -82,7 +98,7 @@ public class DigitalObjectService implements IDigitalObjectService {
       log.info("Found digital object with pid: {}", pid);
       return optional.get();
     } else {
-      String msg = String.format("Couldn't find object with pid %s . Tried to GET from ResourceRepository path: %s", pid);
+      String msg = String.format("Couldn't find object with pid %s - should be at path: %s", pid, doResourceMapper.mapObjectResourcePath(pid));
       log.error(msg);
       throw new ResourceRepositoryException(HttpStatus.NOT_FOUND.value(), msg);
     }
@@ -161,20 +177,84 @@ public class DigitalObjectService implements IDigitalObjectService {
     String mappedProtoPath = doResourceMapper.mapObjectResourcePath(protoPid);
     String mappedDOPath = doResourceMapper.mapObjectResourcePath(pid);
 
-    log.info("Request against protoype {} succesfull. Replacing now {} through {}", protoPid, mappedProtoPath, mappedDOPath);
+    log.info("Request against protoype {} succesfully. Replacing now {} through {}", protoPid, mappedProtoPath, mappedDOPath);
 
     // replacements for prototype
-    //clonedRdf = clonedRdf.replaceAll(mappedProtoPath, mappedDOPath);
-    clonedRdf = clonedRdf.replaceAll("rdf:about=\"" + mappedProtoPath + "\" ", "");
+    clonedRdf = clonedRdf.replaceAll(mappedProtoPath, mappedDOPath);
+    
+
+    /**
+     * From here processing + building of xml based RDF.
+     */
+
+    try {
+      DocumentBuilder builder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
+      Document doc = builder.parse(IOUtils.toInputStream(clonedRdf, "utf-8"));
+
+      doc.getDocumentElement().normalize();
+
+      Node rdfDescription = doc.getElementsByTagName("rdf:Description").item(0);
+
+      NodeList children = rdfDescription.getChildNodes();
 
 
-    // problem here is: endpoint only accepts specific mimetype
-    // (java optional parameters?)
+      String[] forbiddenURIs = {"http://fedora.info/definitions/v4/repository#Resource", "http://www.w3.org/ns/ldp#BasicContainer", "http://www.w3.org/ns/ldp#Resource", "http://www.w3.org/ns/ldp#RDFSource","http://www.w3.org/ns/ldp#Container","http://fedora.info/definitions/v4/repository#Container"};
 
-    throw new NotImplementedException();
+      for (int i = 0; i < children.getLength(); i++){
+        Node child = children.item(i);
+        
+        if(child.getNodeName() == "#text")continue;
+
+        log.debug(child.getNodeName());
+        if(child.getNodeName().contains("fedora:")) {
+          rdfDescription.removeChild(child);
+          continue;
+        };
+
+        if(child.getNodeName() == "rdf:type"){
+
+          String curVal = child.getAttributes().getNamedItem("rdf:resource").getNodeValue();
+
+         if(Arrays.asList(forbiddenURIs).contains(curVal)) rdfDescription.removeChild(child);
+
+
+        }
+        
+      }
+
+      log.info("Succesfully removed system properties from requested prototype digital object {} for {} Trying to send xml: {}", protoPid, pid, documentToString(doc));
+      return this.createDigitalObjectByPid(pid, documentToString(doc));
+
+    } catch (SAXException | IOException | ParserConfigurationException e) {
+      String msg = String.format("Failed to process xml from prototype %s for digital object %s. Starting from prototype rdf metadata: %s", protoPid, pid, clonedRdf);
+      log.error(msg + "\n" + e);
+      throw new ResourceRepositoryException(HttpStatus.INTERNAL_SERVER_ERROR.value(), msg);
+    } 
+    
+
+
+    
 
     //return this.createDigitalObjectByPid(pid, clonedRdf);
     
   }
+
+
+  public static String documentToString(Document doc) {
+    try {
+        StringWriter sw = new StringWriter();
+        TransformerFactory tf = TransformerFactory.newInstance();
+        Transformer transformer = tf.newTransformer();
+        transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "no");
+        transformer.setOutputProperty(OutputKeys.METHOD, "xml");
+        transformer.setOutputProperty(OutputKeys.INDENT, "yes");
+        transformer.setOutputProperty(OutputKeys.ENCODING, "UTF-8");
+
+        transformer.transform(new DOMSource(doc), new StreamResult(sw));
+        return sw.toString();
+    } catch (Exception ex) {
+        throw new RuntimeException("Error converting to String", ex);
+    }
+}
 
 }
