@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<!-- Namespace for Thymeleaf tags! Beyond nearly standard html -->
+<html lang="en" xmlns:th="http://thymeleaf.org">
+  <head th:replace="/fragments/general.html :: head" />
+  <body>
+    <header th:replace="/fragments/general.html :: header"></header>
+    <nav th:replace="/fragments/general.html :: nav"></nav>
+
+    <main class="container vh-100">
+      <br />
+      <h1>Create a digital object</h1>
+
+      <form
+        action="#"
+        th:action="@{/client/createObjectFromPrototype}"
+        method="post"
+      >
+        <p>Pid: <input type="text" name="pid"/></p>
+        <p>Content model: <input type="text" name="contentModel"/></p>
+        <!-- <label for="fname">First name:</label> -->
+        <!-- <input type="text" id="lname" name="lname"><br><br> -->
+        
+        <p>
+          <input type="submit" value="Submit"/>
+          <input type="reset" value="Reset" />
+        </p>
+      </form>
+    </main>
+
+    <footer th:replace="/fragments/general.html :: footer"></footer>
+  </body>
+</html>
