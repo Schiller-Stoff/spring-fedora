@@ -62,7 +62,7 @@ public class FedoraMetadata {
       if (child.getNodeName() == "#text")
         continue;
 
-      if (child.getNodeName().contains("fedora:")) {
+      if ((child.getNodeName().contains("fedora:")) || (child.getNodeName().contains("ldp:contains"))) {
         rdfDescription.removeChild(child);
         continue;
       }
