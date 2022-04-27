@@ -103,4 +103,16 @@ public class SimpleClientController {
     return "redirect:/client/objects";
   } 
 
+  @PostMapping("/createObjectFromPrototype")
+  public String createObjectFromPrototype(@RequestParam String pid, @RequestParam String contentModel){
+    
+    DigitalObject digitalObject = digitalObjectService.createFromPrototypeByPid(pid, contentModel);
+    return "redirect:/client/" + digitalObject.getPid();
+  }
+
+  @GetMapping("/createObjectFromPrototype")
+  public String createObjectFromPrototype(){
+    return "digitalObject/create_from_prototype";
+  }
+
 }
