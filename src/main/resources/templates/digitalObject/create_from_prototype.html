@@ -14,11 +14,19 @@
         action="#"
         th:action="@{/client/createObjectFromPrototype}"
         method="post"
+         class="w-50"
       >
         <p>Pid: <input type="text" name="pid"/></p>
-        <p>Content model: <input type="text" name="contentModel"/></p>
+        <!-- <p>Content model: <input type="text" name="contentModel"/></p> -->
+        <select class="form-select" aria-label="Default select example" name="contentModel">
+          <option value="TEI">TEI</option>
+          <option value="GML">GML</option>
+          <!-- <option value="3">Three</option> -->
+        </select>
         <!-- <label for="fname">First name:</label> -->
         <!-- <input type="text" id="lname" name="lname"><br><br> -->
+
+        <br/>
         
         <p>
           <input type="submit" value="Submit"/>
