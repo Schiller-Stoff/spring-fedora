@@ -199,4 +199,28 @@ public class DigitalObjectService implements IDigitalObjectService {
     
   }
 
+
+  @Override
+  public DigitalObject createFromPrototypeByModel(String pid, String contentModel){
+
+    String protoPid = "";
+
+    switch(contentModel.toUpperCase()){
+      case "TEI":
+        protoPid = "o:prototype.tei";
+        break;
+      case "GML":
+        protoPid = "o:prototype.gml";
+        break;
+      default:
+        String msg = String.format("Found no prototype for given content model %s (should be no pid!). Tried to create object for pid: %s", contentModel, pid);
+        log.error(msg);
+        throw new ResourceRepositoryException(HttpStatus.UNPROCESSABLE_ENTITY.value(), msg);
+    }
+
+    return this.createFromPrototypeByPid(pid, protoPid);
+
+
+  }
+
 }

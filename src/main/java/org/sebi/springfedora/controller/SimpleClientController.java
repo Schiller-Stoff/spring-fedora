@@ -105,8 +105,7 @@ public class SimpleClientController {
 
   @PostMapping("/createObjectFromPrototype")
   public String createObjectFromPrototype(@RequestParam String pid, @RequestParam String contentModel){
-    
-    DigitalObject digitalObject = digitalObjectService.createFromPrototypeByPid(pid, contentModel);
+    DigitalObject digitalObject = digitalObjectService.createFromPrototypeByModel(pid, contentModel);
     return "redirect:/client/" + digitalObject.getPid();
   }
 

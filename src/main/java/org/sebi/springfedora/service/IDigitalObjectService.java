@@ -19,7 +19,8 @@ public interface IDigitalObjectService {
 
   public DigitalObject[] findAll() throws ResourceRepositoryException;
 
-  public DigitalObject createFromPrototypeByPid(String pid, String model);
+  public DigitalObject createFromPrototypeByPid(String pid, String protoPid);
+  public DigitalObject createFromPrototypeByModel(String pid, String model);
 
   public boolean checkIfExists(String pid);
   
