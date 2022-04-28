@@ -8,8 +8,7 @@ import org.springframework.boot.autoconfigure.jdbc.DataSourceTransactionManagerA
 import org.springframework.boot.autoconfigure.jdbc.JdbcTemplateAutoConfiguration;
 import org.springframework.boot.autoconfigure.orm.jpa.HibernateJpaAutoConfiguration;
 
-@SpringBootApplication(exclude = { DataSourceAutoConfiguration.class,
-		DataSourceTransactionManagerAutoConfiguration.class, HibernateJpaAutoConfiguration.class,
+@SpringBootApplication(exclude = {  HibernateJpaAutoConfiguration.class,
 		JpaRepositoriesAutoConfiguration.class, JdbcTemplateAutoConfiguration.class })
 public class SpringFedoraApplication {
 
