@@ -25,8 +25,6 @@ import org.springframework.transaction.support.DefaultTransactionStatus;
 
 import lombok.extern.slf4j.Slf4j;
 
-@Component
-@Primary
 @Slf4j
 public class FedroaPlatformTransactionManager extends AbstractPlatformTransactionManager {
 
@@ -176,11 +174,11 @@ public class FedroaPlatformTransactionManager extends AbstractPlatformTransactio
    * @return {String} transaction id of currently running transaction.
    * @throws TransactionRequiredException
    */
-  public String getTransactionId() throws TransactionRequiredException {
+  public String getTransactionId() throws TransactionSystemException {
     if (this.txid == null){
       String msg = String.format("Transaction id (txid) is null but getTransactionId was called.");
       log.error(msg);
-      throw new TransactionRequiredException(msg);
+      throw new TransactionSystemException(msg);
     }
 
     return doGetTransaction();
