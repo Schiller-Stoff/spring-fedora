@@ -37,7 +37,7 @@ public class FedroaPlatformTransactionManager extends AbstractPlatformTransactio
   private String txid;
 
   public FedroaPlatformTransactionManager() {
-    log.info("Succefully started custom FedoraPlatformTransactionManager");
+    log.info("Succesfully instantiated custom FedoraPlatformTransactionManager as extension of AbstractPlatformTransactionManager");
   }
 
   @Override
@@ -74,11 +74,11 @@ public class FedroaPlatformTransactionManager extends AbstractPlatformTransactio
     } catch (NullPointerException | IllegalArgumentException e) {
       String msg = String.format("Failed at preprocessing for requesting txid from fedora against %s",
           FEDORA_TRANSACTION_ENDPOINT);
-      this.txid = null;
+      // this.txid = null;
       log.error(msg + "\n" + e);
       new TransactionSystemException(msg);
     } catch (FcrepoOperationFailedException e2) {
-      this.txid = null;
+      // this.txid = null;
       String msg = String.format("Failed at creation of new fedora transaction via POST against %s",
           FEDORA_TRANSACTION_ENDPOINT);
       log.error(msg + "\n" + e2);
@@ -127,6 +127,8 @@ public class FedroaPlatformTransactionManager extends AbstractPlatformTransactio
 
   @Override
   protected void doRollback(DefaultTransactionStatus status) throws TransactionException {
+
+    log.debug("Starting rollback of transaction...");
 
     FcrepoClient client = new FcrepoClient.FcrepoClientBuilder().build();
     String curTxid = this.doGetTransaction();
