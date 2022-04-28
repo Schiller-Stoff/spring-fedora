@@ -3,6 +3,8 @@ package org.sebi.springfedora.repository.utils;
 import java.net.URI;
 import java.net.URISyntaxException;
 
+import javax.persistence.TransactionRequiredException;
+
 import org.apache.commons.lang3.StringUtils;
 import org.fcrepo.client.DeleteBuilder;
 import org.fcrepo.client.FcrepoClient;
@@ -39,13 +41,13 @@ public class FedroaPlatformTransactionManager extends AbstractPlatformTransactio
   }
 
   @Override
-  protected String doGetTransaction() throws TransactionException {
+  protected String doGetTransaction() throws TransactionRequiredException {
 
-    // if(txid == null){
-    //   throw new TransactionSystemException("Transaction is set to null !");
-    // }
+    if(txid == null){
+      throw new TransactionRequiredException("TransactionId currently not valid!");
+    }
 
-    return txid;
+    return this.txid;
   }
 
   @Override
@@ -53,19 +55,20 @@ public class FedroaPlatformTransactionManager extends AbstractPlatformTransactio
 
     FcrepoClient client = new FcrepoClient.FcrepoClientBuilder().build();
 
-    String location = null;
-
     try {
       URI uri = URI.create(curHost + fedoraRESTEndpoint + FEDORA_TRANSACTION_ENDPOINT);
       FcrepoResponse response = new PostBuilder(uri, client).perform();
-      // TODO location is a bit misleading? - substringAfter ensures that only the
-      // txid is being returned.
-      location = StringUtils.substringAfter(response.getLocation().getPath(), FEDORA_TRANSACTION_ENDPOINT + "/");
-      log.info("Fedora transaction creation status code {} and location: {}", response.getStatusCode(),
-          response.getLocation().toString());
-      this.txid = location;
-      log.info("POST: Succesfully created new fedora transaction with txid: {} - from endpoint: {}", txid, FEDORA_TRANSACTION_ENDPOINT);
       
+      if(response.getStatusCode() == 201){
+        this.txid = StringUtils.substringAfter(response.getLocation().getPath(), FEDORA_TRANSACTION_ENDPOINT + "/");
+        log.info("POST 201: Succesfully created new fedora transaction with txid: {} - from endpoint: {}", txid, FEDORA_TRANSACTION_ENDPOINT);
+        return;
+      } else {
+        String msg = String.format("Status code: %s Failed POST request against fedora for txid against %s. ",response.getStatusCode(), FEDORA_TRANSACTION_ENDPOINT);//IMPLEMENT!!!
+        log.error(msg);
+        throw new TransactionSystemException(msg);
+      }
+
     } catch (NullPointerException | IllegalArgumentException e) {
       String msg = String.format("Failed at preprocessing for requesting txid from fedora against %s", FEDORA_TRANSACTION_ENDPOINT);
       this.txid = null;
@@ -85,13 +88,18 @@ public class FedroaPlatformTransactionManager extends AbstractPlatformTransactio
 
     FcrepoClient client = new FcrepoClient.FcrepoClientBuilder().build();
 
+    
+
     log.debug("Transaction commit location: {}", FEDORA_TRANSACTION_ENDPOINT);
     try {
-      if (txid != null && txid.startsWith(Common.TX_PREFIX)) {
+        String txid = this.doGetTransaction();
+
         URI uri = URI.create(FEDORA_TRANSACTION_ENDPOINT);
         FcrepoResponse response = new PutBuilder(uri, client).perform();
-        log.debug("Transaction commit status and location: {} {}", response.getStatusCode(), uri.toString());
-      }
+        
+
+        
+      
       // TODO log else?
     } catch (Exception e) {
       log.error(e.getMessage());
