@@ -14,6 +14,8 @@ import org.fcrepo.client.PostBuilder;
 import org.fcrepo.client.PutBuilder;
 import org.sebi.springfedora.Common;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Primary;
+import org.springframework.stereotype.Component;
 import org.springframework.transaction.TransactionDefinition;
 import org.springframework.transaction.TransactionException;
 import org.springframework.transaction.TransactionSuspensionNotSupportedException;
@@ -23,6 +25,8 @@ import org.springframework.transaction.support.DefaultTransactionStatus;
 
 import lombok.extern.slf4j.Slf4j;
 
+@Component
+@Primary
 @Slf4j
 public class FedroaPlatformTransactionManager extends AbstractPlatformTransactionManager {
 
@@ -165,6 +169,21 @@ public class FedroaPlatformTransactionManager extends AbstractPlatformTransactio
       throw new TransactionSystemException(msg);
     }
 
+  }
+
+  /**
+   * Returns currently active transaction from FedoraTransactionManager instance.
+   * @return {String} transaction id of currently running transaction.
+   * @throws TransactionRequiredException
+   */
+  public String getTransactionId() throws TransactionRequiredException {
+    if (this.txid == null){
+      String msg = String.format("Transaction id (txid) is null but getTransactionId was called.");
+      log.error(msg);
+      throw new TransactionRequiredException(msg);
+    }
+
+    return doGetTransaction();
   }
 
 }
