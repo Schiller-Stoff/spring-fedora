@@ -36,7 +36,7 @@ public class FedroaPlatformTransactionManager extends AbstractPlatformTransactio
 
   private String txid;
 
-  public FedroaPlatformTransactionManager(){
+  public FedroaPlatformTransactionManager() {
     log.info("Succefully started custom FedoraPlatformTransactionManager");
   }
 
@@ -44,7 +44,7 @@ public class FedroaPlatformTransactionManager extends AbstractPlatformTransactio
   protected String doGetTransaction() throws TransactionException {
 
     // if(txid == null){
-    //   throw new TransactionSystemException("TransactionId currently not valid!");
+    // throw new TransactionSystemException("TransactionId currently not valid!");
     // }
 
     return this.txid;
@@ -58,25 +58,29 @@ public class FedroaPlatformTransactionManager extends AbstractPlatformTransactio
     try {
       URI uri = URI.create(curHost + fedoraRESTEndpoint + FEDORA_TRANSACTION_ENDPOINT);
       FcrepoResponse response = new PostBuilder(uri, client).perform();
-      
-      if(response.getStatusCode() == 201){
+
+      if (response.getStatusCode() == 201) {
         this.txid = StringUtils.substringAfter(response.getLocation().getPath(), FEDORA_TRANSACTION_ENDPOINT + "/");
-        log.info("POST 201: Succesfully created new fedora transaction with txid: {} - from endpoint: {}", txid, uri.toString());
+        log.info("POST 201: Succesfully created new fedora transaction with txid: {} - from endpoint: {}", txid,
+            uri.toString());
         return;
       } else {
-        String msg = String.format("Status code: %s Failed POST request against fedora for txid against %s. ",response.getStatusCode(), uri.toString());//IMPLEMENT!!!
+        String msg = String.format("Status code: %s Failed POST request against fedora for txid against %s. ",
+            response.getStatusCode(), uri.toString());// IMPLEMENT!!!
         log.error(msg);
         throw new TransactionSystemException(msg);
       }
 
     } catch (NullPointerException | IllegalArgumentException e) {
-      String msg = String.format("Failed at preprocessing for requesting txid from fedora against %s", FEDORA_TRANSACTION_ENDPOINT);
+      String msg = String.format("Failed at preprocessing for requesting txid from fedora against %s",
+          FEDORA_TRANSACTION_ENDPOINT);
       this.txid = null;
       log.error(msg + "\n" + e);
       new TransactionSystemException(msg);
-    } catch(FcrepoOperationFailedException e2){
+    } catch (FcrepoOperationFailedException e2) {
       this.txid = null;
-      String msg = String.format("Failed at creation of new fedora transaction via POST against %s", FEDORA_TRANSACTION_ENDPOINT);
+      String msg = String.format("Failed at creation of new fedora transaction via POST against %s",
+          FEDORA_TRANSACTION_ENDPOINT);
       log.error(msg + "\n" + e2);
       throw new TransactionSystemException(msg);
     }
@@ -90,28 +94,32 @@ public class FedroaPlatformTransactionManager extends AbstractPlatformTransactio
     String curTxid = this.doGetTransaction();
 
     try {
-        URI uri = URI.create(curHost + fedoraRESTEndpoint + FEDORA_TRANSACTION_ENDPOINT + "/" + curTxid);
-        FcrepoResponse response = new PutBuilder(uri, client).perform();
-        
-        if(response.getStatusCode() == 204){
-          //this.txid = StringUtils.substringAfter(response.getLocation().getPath(), uri.toString() + "/");
-          log.info("PUT 201: Succesfully commited fedora transaction with txid: {} - against endpoint: {}", curTxid, uri.toString());
-          return;
-        } else {
-          String msg = String.format("Status code: %s Failed transaction commit (= via PUT request) with txid %s against fedora endpoint %s. ",response.getStatusCode(), curTxid, uri.toString());//IMPLEMENT!!!
-          log.error(msg);
-          throw new TransactionSystemException(msg);
-        }
-        
+      URI uri = URI.create(curHost + fedoraRESTEndpoint + FEDORA_TRANSACTION_ENDPOINT + "/" + curTxid);
+      FcrepoResponse response = new PutBuilder(uri, client).perform();
+
+      if (response.getStatusCode() == 204) {
+        // this.txid = StringUtils.substringAfter(response.getLocation().getPath(),
+        // uri.toString() + "/");
+        log.info("PUT 204: Succesfully commited fedora transaction with txid: {} - against endpoint: {}", curTxid,
+            uri.toString());
+        return;
+      } else {
+        String msg = String.format(
+            "Status code: %s Failed transaction commit (= via PUT request) with txid %s against fedora endpoint %s. ",
+            response.getStatusCode(), curTxid, uri.toString());// IMPLEMENT!!!
+        log.error(msg);
+        throw new TransactionSystemException(msg);
+      }
+
     } catch (NullPointerException | IllegalArgumentException e) {
       String msg = String.format("Failed at preprocessing for transaction commit with txid %s from fedora", curTxid);
-      this.txid = null;
       log.error(msg + "\n" + e.getMessage());
       new TransactionSystemException(msg);
-    } catch(FcrepoOperationFailedException e2){
-      this.txid = null;
-      String msg = String.format("Fcrepo exception. Failed at commit of fedora transaction with txid %s. Got status code: %s", curTxid, e2.getStatusCode());
-      log.error(msg + "\n" + e2);
+    } catch (FcrepoOperationFailedException e2) {
+      String msg = String.format(
+          "Fcrepo exception. Failed at commit of fedora transaction with txid %s. Got status code: %s", curTxid,
+          e2.getStatusCode());
+      log.error(msg + "\n" + e2.getMessage());
       throw new TransactionSystemException(msg);
     }
 
@@ -119,20 +127,41 @@ public class FedroaPlatformTransactionManager extends AbstractPlatformTransactio
 
   @Override
   protected void doRollback(DefaultTransactionStatus status) throws TransactionException {
-    
-    FcrepoClient client = new FcrepoClient.FcrepoClientBuilder().build();
 
-    log.debug("Transaction rollback location: {}", FEDORA_TRANSACTION_ENDPOINT);	 
-		try {
-	    	if (txid != null && txid.startsWith(Common.TX_PREFIX)) {
-	    		URI uri = URI.create(FEDORA_TRANSACTION_ENDPOINT);
-	    		FcrepoResponse response = new DeleteBuilder(uri, client).perform();
-	    		log.debug("Transaction rollback status and location: {} {}", response.getStatusCode(), uri.toString());
-	    	}
-	    	//TODO log else?
-	    } catch (Exception e) {
-	    	log.error(e.getMessage());
-	    } 
+    FcrepoClient client = new FcrepoClient.FcrepoClientBuilder().build();
+    String curTxid = this.doGetTransaction();
+
+    try {
+      URI uri = URI.create(curHost + fedoraRESTEndpoint + FEDORA_TRANSACTION_ENDPOINT + "/" + curTxid);
+      FcrepoResponse response = new DeleteBuilder(uri, client).perform();
+      log.debug("Transaction rollback status and location: {} {}", response.getStatusCode(), uri.toString());
+
+      if (response.getStatusCode() == 204) {
+        log.info(
+            "DELETE 204: Succesfully rolled back and closed fedora transaction with txid: {} - against endpoint: {}",
+            curTxid, uri.toString());
+        this.txid = null;
+        return;
+      } else {
+        String msg = String.format(
+            "Status code: %s Failed transaction rollback (= via DELETE request) with txid %s against fedora endpoint %s. ",
+            response.getStatusCode(), curTxid, uri.toString());// IMPLEMENT!!!
+        log.error(msg);
+        this.txid = null;
+        throw new TransactionSystemException(msg);
+      }
+
+    } catch (NullPointerException | IllegalArgumentException e) {
+      String msg = String.format("Failed at preprocessing for transaction rollback with txid %s from fedora", curTxid);
+      log.error(msg + "\n" + e.getMessage());
+      new TransactionSystemException(msg);
+    } catch (FcrepoOperationFailedException e2) {
+      String msg = String.format(
+          "Fcrepo exception. Failed at rollback of fedora transaction with txid %s. Got status code: %s", curTxid,
+          e2.getStatusCode());
+      log.error(msg + "\n" + e2.getMessage());
+      throw new TransactionSystemException(msg);
+    }
 
   }
 
