@@ -31,6 +31,7 @@ import org.sebi.springfedora.utils.Rename;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.MimeType;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
@@ -72,8 +73,9 @@ public class DigitalObjectService implements IDigitalObjectService {
     String resourcePath = doResourceMapper.mapObjectResourcePath(pid); 
 
     // check if resource already exists
-    if(this.checkIfExists(pid)) {
+    if(digitalObjectRepository.existsById(pid)) {
       String msg = String.format("Creation of object failed. Resource already exists for object with pid: %s . Found existing resource path: %s", pid, resourcePath);
+      log.error(msg);
       throw new ResourceRepositoryException(HttpStatus.CONFLICT.value(), msg);
     }
 
