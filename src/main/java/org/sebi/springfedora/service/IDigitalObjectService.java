@@ -26,4 +26,6 @@ public interface IDigitalObjectService {
   
   public String mapPidToResourcePath(String pid);
   public String mapObjectResourcePath(String pid);
+
+  public DigitalObject createTrans(String pid) throws ResourceRepositoryException;
 }

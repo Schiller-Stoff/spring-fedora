@@ -86,6 +86,7 @@ public class DigitalObjectService implements IDigitalObjectService {
     return digitalObject;
   }
 
+
   @Override
   public DigitalObject findDigitalObjectByPid(String pid) throws ResourceRepositoryException {
     // TODO Auto-generated method stub
@@ -223,6 +224,23 @@ public class DigitalObjectService implements IDigitalObjectService {
     return this.createFromPrototypeByPid(pid, protoPid);
 
 
+  }
+
+  @Transactional(rollbackFor = Exception.class)
+  public DigitalObject createTrans(String pid) throws ResourceRepositoryException {
+
+    String path = doResourceMapper.mapObjectResourcePath(pid);
+
+    Optional<DigitalObject> dObject = digitalObjectRepository.findById(pid);
+
+    if(dObject.isPresent()){
+      String msg = String.format("Object with pid %s already exists. Found existing resource with path %s", pid, path);
+      log.error(msg);
+      throw new ResourceRepositoryException(HttpStatus.CONFLICT.value(), msg);
+    }
+ 
+    DigitalObject digitalObject = new DigitalObject(pid, path, null);
+    return digitalObjectRepository.save(digitalObject);
   }
 
 }
