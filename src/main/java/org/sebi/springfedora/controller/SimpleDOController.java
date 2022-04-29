@@ -43,7 +43,7 @@ public class SimpleDOController {
 
   @GetMapping("{pid}/create")
   public DigitalObject creaDigitalObject(@PathVariable("pid") String pid){
-    return this.digitalObjectService.createDigitalObjectByPid(pid);
+    return this.digitalObjectService.createTrans(pid);
   }
 
 
