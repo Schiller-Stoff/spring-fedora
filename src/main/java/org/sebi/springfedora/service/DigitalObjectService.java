@@ -109,6 +109,7 @@ public class DigitalObjectService implements IDigitalObjectService {
 
   }
 
+  @Transactional
   @Override
   public DigitalObject deleteDigitalObjectByPid(String pid) throws ResourceRepositoryException {
     DigitalObject digitalObject = this.findDigitalObjectByPid(pid);
