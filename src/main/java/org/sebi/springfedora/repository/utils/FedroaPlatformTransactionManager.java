@@ -39,15 +39,17 @@ public class FedroaPlatformTransactionManager extends AbstractPlatformTransactio
   private String txid;
 
   public FedroaPlatformTransactionManager() {
+    // not allowed to be null
+    this.txid = "";
     log.info("Succesfully instantiated custom FedoraPlatformTransactionManager as extension of AbstractPlatformTransactionManager");
   }
 
   @Override
   protected String doGetTransaction() throws TransactionException {
 
-    // if(txid == null){
-    //   throw new TransactionSystemException("TransactionId currently not valid!");
-    // }
+    if(txid == null){
+      throw new TransactionSystemException("Transaction id should never be null! ");
+    }
 
     return this.txid;
   }
