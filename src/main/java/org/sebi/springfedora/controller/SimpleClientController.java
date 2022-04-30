@@ -6,6 +6,7 @@ import org.sebi.springfedora.exception.ResourceRepositoryException;
 import org.sebi.springfedora.model.Datastream;
 import org.sebi.springfedora.model.DigitalObject;
 import org.sebi.springfedora.model.Resource;
+import org.sebi.springfedora.service.ContentModelService;
 import org.sebi.springfedora.service.IDatastreamService;
 import org.sebi.springfedora.service.IDigitalObjectService;
 import org.springframework.stereotype.Controller;
@@ -27,11 +28,13 @@ public class SimpleClientController {
 
   IDigitalObjectService digitalObjectService;
   IDatastreamService datastreamService;
+  ContentModelService contentModelService;
 
 
-  public SimpleClientController(IDigitalObjectService digitalObjectService, IDatastreamService datastreamService){
+  public SimpleClientController(IDigitalObjectService digitalObjectService, IDatastreamService datastreamService, ContentModelService contentModelService){
     this.digitalObjectService = digitalObjectService;
     this.datastreamService = datastreamService;
+    this.contentModelService = contentModelService;
   }
   
 
@@ -105,7 +108,7 @@ public class SimpleClientController {
 
   @PostMapping("/createObjectFromPrototype")
   public String createObjectFromPrototype(@RequestParam String pid, @RequestParam String contentModel){
-    DigitalObject digitalObject = digitalObjectService.createFromPrototypeByModel(pid, contentModel);
+    DigitalObject digitalObject = contentModelService.createFromPrototypeByModel(pid, contentModel);
     return "redirect:/client/" + digitalObject.getPid();
   }
 
