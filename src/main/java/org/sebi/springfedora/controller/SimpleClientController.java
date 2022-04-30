@@ -58,7 +58,7 @@ public class SimpleClientController {
   @PostMapping("/createObject")
   public String postObject(@RequestParam String pid, Model model){
 
-    DigitalObject digitalObject = digitalObjectService.createDigitalObjectByPid(pid);
+    DigitalObject digitalObject = digitalObjectService.createDigitalObjectByPid(pid, null);
     model.addAttribute("do", digitalObject);
     return "redirect:/client/" + digitalObject.getPid();
   }
