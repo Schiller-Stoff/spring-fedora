@@ -4,6 +4,7 @@ import org.apache.commons.lang3.NotImplementedException;
 import org.sebi.springfedora.exception.ResourceRepositoryException;
 import org.sebi.springfedora.model.Datastream;
 import org.sebi.springfedora.repository.Datastream.DatastreamRepository;
+import org.sebi.springfedora.utils.DOResourceMapper;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -18,6 +19,7 @@ public class DatastreamService implements IDatastreamService  {
 
   private DatastreamRepository datastreamRepository;
   private IDigitalObjectService digitalObjectService;
+  private DOResourceMapper doResourceMapper;
 
   @Value("${gams.curHost}")
   private String curHost;
@@ -25,9 +27,10 @@ public class DatastreamService implements IDatastreamService  {
   @Value("${gams.fedoraRESTEndpoint}")
   private String fedoraRESTEndpoint;
 
-  public DatastreamService(DatastreamRepository datastreamRepository, IDigitalObjectService digitalObjectService){
+  public DatastreamService(DatastreamRepository datastreamRepository, IDigitalObjectService digitalObjectService, DOResourceMapper doResourceMapper){
     this.datastreamRepository = datastreamRepository;
     this.digitalObjectService = digitalObjectService;
+    this.doResourceMapper = doResourceMapper;
   }
 
   @Override
@@ -37,17 +40,14 @@ public class DatastreamService implements IDatastreamService  {
   
   @Override
   public void deleteByDsid(String pid, String dsid) {
-    String mappedPid = digitalObjectService.mapPidToResourcePath(pid);
-    String path = curHost + fedoraRESTEndpoint + mappedPid + "/datastream/" + dsid;
+    String path = doResourceMapper.mapObjectResourcePath(pid) + "/datastream/" + dsid;
     datastreamRepository.deleteById(path);
     
   }
 
   public Datastream createById(String id, String mimetype, String pid, byte[] content) throws ResourceRepositoryException {
     
-    String mappedPid = digitalObjectService.mapPidToResourcePath(pid);
-
-    String path = curHost + fedoraRESTEndpoint + mappedPid + "/datastream/" + id;
+    String path = doResourceMapper.mapObjectResourcePath(pid) + "/datastream/" + id;
 
     // throw if already exists
     if(datastreamRepository.existsById(path)){

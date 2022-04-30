@@ -20,7 +20,4 @@ public interface IDigitalObjectService {
   public DigitalObject[] findAll() throws ResourceRepositoryException;
 
   public boolean checkIfExists(String pid);
-  
-  public String mapPidToResourcePath(String pid);
-  public String mapObjectResourcePath(String pid);
 }
