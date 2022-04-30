@@ -7,6 +7,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import javax.transaction.TransactionManager;
+
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -19,12 +21,16 @@ import org.sebi.springfedora.model.DigitalObject;
 import org.sebi.springfedora.model.Resource;
 import org.sebi.springfedora.repository.IResourceRepository;
 import org.sebi.springfedora.repository.ResourceRDFMapper;
+import org.sebi.springfedora.repository.utils.FedroaPlatformTransactionManager;
 import org.sebi.springfedora.repository.utils.RepositoryUtils;
 import org.sebi.springfedora.utils.DOResourceMapper;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.PlatformTransactionManager;
+import org.springframework.transaction.TransactionSystemException;
+import org.springframework.transaction.support.DefaultTransactionDefinition;
 import org.springframework.web.client.RestTemplate;
 
 import org.fcrepo.client.DeleteBuilder;
@@ -50,18 +56,23 @@ public class DigitalObjectRepository implements IDigitalObjectRepository  {
   @Value("${gams.fedoraRESTEndpoint}")
   private String fedoraRESTEndpoint;
 
+  private FedroaPlatformTransactionManager transactionManager;
+
   private IResourceRepository resourceRepository;
 
   private DOResourceMapper doResourceMapper;
 
-  public DigitalObjectRepository(IResourceRepository resourceRepository, DOResourceMapper doResourceMapper){
+  public DigitalObjectRepository(IResourceRepository resourceRepository, DOResourceMapper doResourceMapper, PlatformTransactionManager fedroaPlatformTransactionManager){
     this.resourceRepository = resourceRepository;
     this.doResourceMapper = doResourceMapper;
+    this.transactionManager = (FedroaPlatformTransactionManager) fedroaPlatformTransactionManager;
   }
 
   @Override
-  public <S extends DigitalObject> S save(S digitalObject) {
+  public <S extends DigitalObject> S save(S digitalObject) throws ResourceRepositoryException {
     URI uri =  RepositoryUtils.parseToURI(digitalObject.getPath());
+
+    String txid = retrieveTxid(transactionManager);
 
     // rdf might be null
     // need to use mimetype text/turtle if just the resource should be created
@@ -70,24 +81,25 @@ public class DigitalObjectRepository implements IDigitalObjectRepository  {
 
     InputStream triplesIStream = IOUtils.toInputStream(triples, "utf-8");
 
-    log.info("Initiating PUT request for: {}. With rdf: {}", digitalObject.getPath(), triples);
+    log.debug("Initiating PUT request for: {}. With txid {}", digitalObject.getPath(), txid);
 
     try (
       final FcrepoClient client = FcrepoClient.client().build();
       FcrepoResponse response = new PutBuilder(uri, client)
           .body( triplesIStream, curMimetype)
           //.slug(uri.toString())
+          .addHeader("Atomic-ID", txid)
           .perform()
     ) {
 
       if(response.getStatusCode() == 201 ){
-        log.info("Succesfully saved digital object {} with path: {} ", digitalObject.getPid(), digitalObject.getPath());
+        log.info("Succesfully saved digital object {} with path: {}. With txid {} ", digitalObject.getPid(), digitalObject.getPath(), txid);
         return digitalObject;
       } else if (response.getStatusCode() == 204){
-        log.info("Succesfully saved digital object {} with path: {}. Without content", digitalObject.getPid(), digitalObject.getPath());
+        log.info("Succesfully saved digital object {} with path: {}. Without content. With txid: {}", digitalObject.getPid(), digitalObject.getPath(), txid);
         return digitalObject;
       } else {
-        String msg = String.format("Failed to save digital object %s with path: %s. Original message: %s",digitalObject.getPid(), digitalObject.getPath(), resourceRepository.retrieveFedoraErrBodyMsg(response));
+        String msg = String.format("Failed to save digital object %s with path: %s. Original message: %s. Txid: %s",digitalObject.getPid(), digitalObject.getPath(), resourceRepository.retrieveFedoraErrBodyMsg(response), txid);
         log.error(msg);
         throw new ResourceRepositoryException(response.getStatusCode(), msg);
       }
@@ -97,9 +109,9 @@ public class DigitalObjectRepository implements IDigitalObjectRepository  {
       log.error(msg + "\n" + e);
       throw new ResourceRepositoryException(HttpStatus.INTERNAL_SERVER_ERROR.value(), msg);
     } catch (FcrepoOperationFailedException e1) {
-      String msg = String.format("Failed to save digital object %s with path: %s. Original message: %s. For RDF: %s", digitalObject.getPid(), digitalObject.getPath(), e1.getMessage(), digitalObject.getRdfXml());
+      String msg = String.format("Failed to save digital object %s with path: %s. Against url: %s Original message: %s. With txid: %s For RDF: %s", digitalObject.getPid(), digitalObject.getPath(), uri.toString(), e1.getMessage(),txid, digitalObject.getRdfXml());
       log.error(msg + "\n" + e1);
-      throw new ResourceRepositoryException(e1.getStatusCode(), msg);
+      throw new ResourceRepositoryException(HttpStatus.INTERNAL_SERVER_ERROR.value(), msg);
     } catch (Exception e){
       // pass through thrown if status codes are 400+ from above
       if(e instanceof ResourceRepositoryException) throw e;
@@ -258,6 +270,22 @@ public class DigitalObjectRepository implements IDigitalObjectRepository  {
   @Override
   public void deleteAll() {
     throw new NotImplementedException("Method not implemented!");
+  }
+
+  /**
+   * Retrieves transaction id from FedoraTransactionManager
+   * @return {String} Transaction id. Might be an empty string.
+   */
+  private String retrieveTxid(FedroaPlatformTransactionManager transactionManager){
+    String txid = ""; 
+    try {
+      txid = transactionManager.getTransactionId();
+    } catch(TransactionSystemException e){
+      String msg = String.format("Request transaction insecure - Failed to extract txid from FedoraPlatformTransactionManager %s", e.getMessage());
+      log.error(msg);
+      throw new ResourceRepositoryException(HttpStatus.UNPROCESSABLE_ENTITY.value(), msg);
+    }
+    return txid;
   }
   
 }
