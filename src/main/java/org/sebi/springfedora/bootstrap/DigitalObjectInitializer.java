@@ -38,19 +38,11 @@ public class DigitalObjectInitializer implements CommandLineRunner {
   @Override
   public void run(String... args) throws Exception {
     log.debug("Bootstraping fedora spring stuff...");
-    
+    setupService.createBaseResources();
     setupFedoraPrototypes();
   }
 
-  private void initConnections() {
-
-    
-
-  }
-
   private void setupFedoraPrototypes(){
-
-    setupService.createBaseResources();
 
     // (at johannes code: loop through folder in apache and create objects accordingly)
 
