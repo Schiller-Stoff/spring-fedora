@@ -4,10 +4,12 @@ import org.apache.commons.lang3.NotImplementedException;
 import org.sebi.springfedora.exception.ResourceRepositoryException;
 import org.sebi.springfedora.model.Datastream;
 import org.sebi.springfedora.repository.Datastream.DatastreamRepository;
+import org.sebi.springfedora.repository.DigitalObject.IDigitalObjectRepository;
 import org.sebi.springfedora.utils.DOResourceMapper;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.MimeType;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -18,7 +20,7 @@ import lombok.extern.slf4j.Slf4j;
 public class DatastreamService implements IDatastreamService  {
 
   private DatastreamRepository datastreamRepository;
-  private IDigitalObjectService digitalObjectService;
+  private IDigitalObjectRepository digitalObjectRepository;
   private DOResourceMapper doResourceMapper;
 
   @Value("${gams.curHost}")
@@ -27,9 +29,9 @@ public class DatastreamService implements IDatastreamService  {
   @Value("${gams.fedoraRESTEndpoint}")
   private String fedoraRESTEndpoint;
 
-  public DatastreamService(DatastreamRepository datastreamRepository, IDigitalObjectService digitalObjectService, DOResourceMapper doResourceMapper){
+  public DatastreamService(DatastreamRepository datastreamRepository, IDigitalObjectRepository digitalObjectRepository, DOResourceMapper doResourceMapper){
     this.datastreamRepository = datastreamRepository;
-    this.digitalObjectService = digitalObjectService;
+    this.digitalObjectRepository = digitalObjectRepository;
     this.doResourceMapper = doResourceMapper;
   }
 
@@ -45,6 +47,7 @@ public class DatastreamService implements IDatastreamService  {
     
   }
 
+  @Transactional
   public Datastream createById(String id, String mimetype, String pid, byte[] content) throws ResourceRepositoryException {
     
     String path = doResourceMapper.mapObjectResourcePath(pid) + "/datastream/" + id;
@@ -57,7 +60,7 @@ public class DatastreamService implements IDatastreamService  {
     }
 
     // datastreams are only allowed if object exists
-    if(!digitalObjectService.checkIfExists(pid)){
+    if(!digitalObjectRepository.existsById(pid)){
       String msg = String.format("Digital object not found. Creation of datastream with id %s at path %s failed. Linked digital object with pid: %s does not exist! Tried mimetype: %s", id, path, pid, mimetype);
       log.error(msg);
       throw new ResourceRepositoryException(HttpStatus.NOT_FOUND.value(), msg);

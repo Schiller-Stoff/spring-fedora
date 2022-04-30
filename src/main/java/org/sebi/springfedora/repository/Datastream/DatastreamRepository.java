@@ -19,9 +19,12 @@ import org.sebi.springfedora.exception.ResourceRepositoryException;
 import org.sebi.springfedora.model.Datastream;
 import org.sebi.springfedora.model.Resource;
 import org.sebi.springfedora.repository.ResourceRepository;
+import org.sebi.springfedora.repository.utils.FedroaPlatformTransactionManager;
 import org.sebi.springfedora.repository.utils.RepositoryUtils;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.PlatformTransactionManager;
+import org.springframework.transaction.TransactionSystemException;
 import org.springframework.util.MimeType;
 
 import lombok.extern.slf4j.Slf4j;
@@ -31,9 +34,11 @@ import lombok.extern.slf4j.Slf4j;
 public class DatastreamRepository implements IDatastreamRepository {
 
   private ResourceRepository resourceRepository;
+  private FedroaPlatformTransactionManager fedroaPlatformTransactionManager;
 
-  public DatastreamRepository(ResourceRepository resourceRepository){
+  public DatastreamRepository(ResourceRepository resourceRepository, PlatformTransactionManager platformTransactionManager){
     this.resourceRepository = resourceRepository;
+    this.fedroaPlatformTransactionManager = (FedroaPlatformTransactionManager) platformTransactionManager;
   }
 
   @Override
@@ -50,10 +55,13 @@ public class DatastreamRepository implements IDatastreamRepository {
 
     log.info("Initiating PUT request for datastream: {}. With rdf: {}", datastream.getPath(), triples);
 
+    String txid = retrieveTxid(fedroaPlatformTransactionManager);
+
     try (
       final FcrepoClient client = FcrepoClient.client().build();
       FcrepoResponse response = new PutBuilder(uri, client)
           .body( content, curMimetype)
+          .addHeader("Atomic-ID", txid)
           .perform()
     ) {
 
@@ -206,6 +214,22 @@ public class DatastreamRepository implements IDatastreamRepository {
       throw new ResourceRepositoryException(HttpStatus.UNSUPPORTED_MEDIA_TYPE.value(), msg);
     }
     
+  }
+
+  /**
+   * Retrieves transaction id from FedoraTransactionManager
+   * @return {String} Transaction id. Might be an empty string.
+   */
+  private String retrieveTxid(FedroaPlatformTransactionManager transactionManager){
+    String txid = ""; 
+    try {
+      txid = transactionManager.getTransactionId();
+    } catch(TransactionSystemException e){
+      String msg = String.format("Request transaction insecure - Failed to extract txid from FedoraPlatformTransactionManager %s", e.getMessage());
+      log.error(msg);
+      throw new ResourceRepositoryException(HttpStatus.UNPROCESSABLE_ENTITY.value(), msg);
+    }
+    return txid;
   }
 
 
