@@ -9,7 +9,7 @@ import org.springframework.data.rest.webmvc.ResourceNotFoundException;
 
 public interface IDigitalObjectService {
   
-  public DigitalObject createDigitalObjectByPid(String pid);
+  // public DigitalObject createDigitalObjectByPid(String pid);
   public DigitalObject createDigitalObjectByPid(String pid, String rdf);
   public DigitalObject findDigitalObjectByPid(String pid) throws ResourceRepositoryException; 
   
