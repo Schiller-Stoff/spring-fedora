@@ -45,12 +45,6 @@ public class SimpleDOController {
     return this.digitalObjectService.deleteDigitalObjectByPid(pid);
   }
 
-  @GetMapping("{pid}/create")
-  public DigitalObject creaDigitalObject(@PathVariable("pid") String pid){
-    return this.digitalObjectService.createTrans(pid);
-  }
-
-
   @GetMapping("{pid}/updateDcTitle/{dc}")
   public DigitalObject updateDOTriples(@PathVariable("pid") String pid, @PathVariable("dc") String dcTitle) throws URISyntaxException, ResourceRepositoryException {
     String sparql = Common.ADDRDFPROPERTY.replace("$1", "dc:title \""+ dcTitle + "\"");
