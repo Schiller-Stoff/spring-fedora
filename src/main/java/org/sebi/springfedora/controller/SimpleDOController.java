@@ -8,7 +8,9 @@ import org.sebi.springfedora.exception.ResourceNotFoundException;
 import org.sebi.springfedora.exception.ResourceRepositoryException;
 import org.sebi.springfedora.model.DigitalObject;
 import org.sebi.springfedora.repository.DigitalObject.IDigitalObjectRepository;
+import org.sebi.springfedora.service.ContentModelService;
 import org.sebi.springfedora.service.IDigitalObjectService;
+import org.sebi.springfedora.service.utils.ContentModelUtils;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -19,9 +21,11 @@ import org.springframework.web.bind.annotation.RestController;
 public class SimpleDOController {
   
   private IDigitalObjectService digitalObjectService;
+  private ContentModelService contentModelService;
   
-  public SimpleDOController(IDigitalObjectService digitalObjectService) {
+  public SimpleDOController(IDigitalObjectService digitalObjectService, ContentModelService contentModelService) {
 	  this.digitalObjectService = digitalObjectService;
+    this.contentModelService = contentModelService;
   }
 	
 
@@ -56,11 +60,6 @@ public class SimpleDOController {
   @GetMapping("")
   public DigitalObject[] getAllDOs(){
     return digitalObjectService.findAll();
-  }
-
-  @GetMapping("{pid}/create/{protoPid}")
-  public DigitalObject cloneObject(@PathVariable String pid, @PathVariable String protoPid){
-    return digitalObjectService.createFromPrototypeByPid(pid, protoPid);
   }
 
 }
