@@ -72,7 +72,7 @@ public class DigitalObjectRepository implements IDigitalObjectRepository  {
   public <S extends DigitalObject> S save(S digitalObject) throws ResourceRepositoryException {
     URI uri =  RepositoryUtils.parseToURI(digitalObject.getPath());
 
-    String txid = retrieveTxid(transactionManager);
+    String txid = transactionManager.getTransactionId();
 
     // rdf might be null
     // need to use mimetype text/turtle if just the resource should be created
@@ -270,22 +270,6 @@ public class DigitalObjectRepository implements IDigitalObjectRepository  {
   @Override
   public void deleteAll() {
     throw new NotImplementedException("Method not implemented!");
-  }
-
-  /**
-   * Retrieves transaction id from FedoraTransactionManager
-   * @return {String} Transaction id. Might be an empty string.
-   */
-  private String retrieveTxid(FedroaPlatformTransactionManager transactionManager){
-    String txid = ""; 
-    try {
-      txid = transactionManager.getTransactionId();
-    } catch(TransactionSystemException e){
-      String msg = String.format("Request transaction insecure - Failed to extract txid from FedoraPlatformTransactionManager %s", e.getMessage());
-      log.error(msg);
-      throw new ResourceRepositoryException(HttpStatus.UNPROCESSABLE_ENTITY.value(), msg);
-    }
-    return txid;
   }
   
 }

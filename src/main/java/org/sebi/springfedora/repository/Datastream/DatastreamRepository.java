@@ -55,7 +55,7 @@ public class DatastreamRepository implements IDatastreamRepository {
 
     log.info("Initiating PUT request for datastream: {}. With rdf: {}", datastream.getPath(), triples);
 
-    String txid = retrieveTxid(fedroaPlatformTransactionManager);
+    String txid = fedroaPlatformTransactionManager.getTransactionId();
 
     try (
       final FcrepoClient client = FcrepoClient.client().build();
@@ -214,22 +214,6 @@ public class DatastreamRepository implements IDatastreamRepository {
       throw new ResourceRepositoryException(HttpStatus.UNSUPPORTED_MEDIA_TYPE.value(), msg);
     }
     
-  }
-
-  /**
-   * Retrieves transaction id from FedoraTransactionManager
-   * @return {String} Transaction id. Might be an empty string.
-   */
-  private String retrieveTxid(FedroaPlatformTransactionManager transactionManager){
-    String txid = ""; 
-    try {
-      txid = transactionManager.getTransactionId();
-    } catch(TransactionSystemException e){
-      String msg = String.format("Request transaction insecure - Failed to extract txid from FedoraPlatformTransactionManager %s", e.getMessage());
-      log.error(msg);
-      throw new ResourceRepositoryException(HttpStatus.UNPROCESSABLE_ENTITY.value(), msg);
-    }
-    return txid;
   }
 
 

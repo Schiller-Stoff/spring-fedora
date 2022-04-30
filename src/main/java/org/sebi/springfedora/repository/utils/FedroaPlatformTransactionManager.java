@@ -13,8 +13,10 @@ import org.fcrepo.client.FcrepoResponse;
 import org.fcrepo.client.PostBuilder;
 import org.fcrepo.client.PutBuilder;
 import org.sebi.springfedora.Common;
+import org.sebi.springfedora.exception.ResourceRepositoryException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Primary;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.TransactionDefinition;
 import org.springframework.transaction.TransactionException;
@@ -168,13 +170,13 @@ public class FedroaPlatformTransactionManager extends AbstractPlatformTransactio
   /**
    * Returns currently active transaction from FedoraTransactionManager instance.
    * @return {String} transaction id of currently running transaction.
-   * @throws TransactionSystemException if transaction id is null or empty string. 
+   * @throws ResourceRepositoryException if transaction id is null or empty string. 
    */
-  public String getTransactionId() throws TransactionSystemException {
+  public String getTransactionId() throws ResourceRepositoryException {
     if ((this.txid == null) || (this.txid == "")){
       String msg = String.format("Demanded INVALID transaction id. Transaction id (txid) is null or '' but was demanded for fedora http operation");
       log.error(msg);
-      throw new TransactionSystemException(msg);
+      throw new ResourceRepositoryException(HttpStatus.UNPROCESSABLE_ENTITY.value(), msg);
     }
 
     return doGetTransaction();
