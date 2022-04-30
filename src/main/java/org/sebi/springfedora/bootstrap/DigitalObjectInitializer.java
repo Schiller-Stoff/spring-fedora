@@ -159,7 +159,7 @@ public class DigitalObjectInitializer implements CommandLineRunner {
 
   private void createDigitalObject(String pid){
     try {
-      this.DOService.createDigitalObjectByPid(pid);
+      this.DOService.createDigitalObjectByPid(pid, null);
     } catch ( ResourceRepositoryException e){
       //skip already existing
     }
