@@ -12,6 +12,7 @@ import org.sebi.springfedora.model.Resource;
 import org.sebi.springfedora.repository.IResourceRepository;
 import org.sebi.springfedora.service.IDatastreamService;
 import org.sebi.springfedora.service.IDigitalObjectService;
+import org.sebi.springfedora.service.ISetupService;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
 
@@ -25,11 +26,13 @@ public class DigitalObjectInitializer implements CommandLineRunner {
   private final IDigitalObjectService DOService;
   private final IResourceRepository resourceRepository;
   private final IDatastreamService datastreamService;
+  private final ISetupService setupService;
 
-  public DigitalObjectInitializer(IDigitalObjectService DOService, IResourceRepository resourceRepository, IDatastreamService datastreamService) {
+  public DigitalObjectInitializer(IDigitalObjectService DOService, IResourceRepository resourceRepository, IDatastreamService datastreamService, ISetupService setupService) {
     this.DOService = DOService;
     this.resourceRepository = resourceRepository;
     this.datastreamService = datastreamService;
+    this.setupService = setupService;
   }
 
   @Override
@@ -47,26 +50,7 @@ public class DigitalObjectInitializer implements CommandLineRunner {
 
   private void setupFedoraPrototypes(){
 
-    // create basic resources
-    List<Resource> resourceList = Arrays.asList(
-      new Resource("http://localhost:8082/rest/objects", ""),
-      new Resource("http://localhost:8082/rest/aggregations", ""),
-      new Resource("http://localhost:8082/rest/aggregations/context", ""),
-      new Resource("http://localhost:8082/rest/aggregations/corpus", ""),
-      new Resource("http://localhost:8082/rest/aggregations/query", ""),
-      new Resource("http://localhost:8082/rest/cm4f", ""),
-      new Resource("http://localhost:8082/rest/cm4f/defaults", "")
-      // new Resource("http://localhost:8082/rest/cm4f/defaults/sampleText9", "", MimeType.valueOf("text/plain"), "".getBytes())
-    );
-    
-    resourceList.forEach(resource -> {
-      
-      if(resourceRepository.existsById(resource.getPath())){
-        log.debug("Bootstrap: Skipping resource creation because already existing at uri: {}" , resource.getPath()); 
-      } else {
-        resourceRepository.save(resource);
-      }
-    });
+    setupService.createBaseResources();
 
     // (at johannes code: loop through folder in apache and create objects accordingly)
 
