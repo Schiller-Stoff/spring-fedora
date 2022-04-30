@@ -117,6 +117,7 @@ public class DigitalObjectService implements IDigitalObjectService {
     return digitalObject;
   }
 
+  @Transactional
   @Override
   public DigitalObject updateMetadataByPid(String pid, String sparql) throws ResourceRepositoryException {
 
