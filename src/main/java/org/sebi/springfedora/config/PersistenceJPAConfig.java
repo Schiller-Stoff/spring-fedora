@@ -23,7 +23,7 @@ public class PersistenceJPAConfig{
    @Bean
    public PlatformTransactionManager transactionManager(){
 
-    log.error("!!APPLYING transaction manager");
+      log.debug("### APPLYING custom transaction manager ### ");
 
       // JpaTransactionManager transactionManager = new JpaTransactionManager();
       // transactionManager.setEntityManagerFactory(
