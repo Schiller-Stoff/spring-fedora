@@ -9,6 +9,7 @@ import java.util.Optional;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.NotImplementedException;
 import org.fcrepo.client.DeleteBuilder;
 import org.fcrepo.client.FcrepoClient;
 import org.fcrepo.client.FcrepoOperationFailedException;
@@ -18,9 +19,11 @@ import org.fcrepo.client.PatchBuilder;
 import org.fcrepo.client.PutBuilder;
 import org.sebi.springfedora.exception.ResourceRepositoryException;
 import org.sebi.springfedora.model.Resource;
+import org.sebi.springfedora.repository.utils.FedroaPlatformTransactionManager;
 import org.sebi.springfedora.repository.utils.RepositoryUtils;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.util.MimeType;
 import org.xml.sax.SAXException;
 
@@ -29,6 +32,12 @@ import lombok.extern.slf4j.Slf4j;
 @Repository
 @Slf4j
 public class ResourceRepository implements IResourceRepository<Resource> {
+
+  private FedroaPlatformTransactionManager fedroaPlatformTransactionManager;
+
+  public ResourceRepository(PlatformTransactionManager platformTransactionManager){
+    this.fedroaPlatformTransactionManager = (FedroaPlatformTransactionManager) platformTransactionManager;
+  }
 
   @Override
   public <S extends Resource> S save(S resource) throws ResourceRepositoryException {
@@ -45,10 +54,13 @@ public class ResourceRepository implements IResourceRepository<Resource> {
 
     log.info("Initiating post request for: {}. With rdf: {}", resource.getPath(), triples);
 
+    String txid = fedroaPlatformTransactionManager.getTransactionId();
+
     try (
       final FcrepoClient client = FcrepoClient.client().build();
       FcrepoResponse response = new PutBuilder(uri, client)
           .body( triplesIStream, "text/turtle")
+          .addHeader("Atomic-ID", txid)
           //.slug(uri.toString())
           .perform()
     ) {
@@ -86,8 +98,8 @@ public class ResourceRepository implements IResourceRepository<Resource> {
 
   @Override
   public <S extends Resource> Iterable<S> saveAll(Iterable<S> entities) {
-    // TODO Auto-generated method stub
-    return null;
+    throw new NotImplementedException();
+    // return null;
   }
 
   @Override
@@ -135,20 +147,17 @@ public class ResourceRepository implements IResourceRepository<Resource> {
 
   @Override
   public Iterable<Resource> findAll() {
-    // TODO Auto-generated method stub
-    return null;
+    throw new NotImplementedException();
   }
 
   @Override
   public Iterable<Resource> findAllById(Iterable<String> ids) {
-    // TODO Auto-generated method stub
-    return null;
+    throw new NotImplementedException();
   }
 
   @Override
   public long count() {
-    // TODO Auto-generated method stub
-    return 0;
+    throw new NotImplementedException();
   }
 
   @Override
@@ -156,9 +165,11 @@ public class ResourceRepository implements IResourceRepository<Resource> {
     
     URI uri = RepositoryUtils.parseToURI(id);
     
+    String txid = fedroaPlatformTransactionManager.getTransactionId();
+
     try (
       final FcrepoClient client = FcrepoClient.client().build();
-      FcrepoResponse response = new DeleteBuilder(uri, client).perform();
+      FcrepoResponse response = new DeleteBuilder(uri, client).addHeader("Atomic-ID", txid).perform();
     ) {
 
       log.debug("Resource deletion status: {}", response.getStatusCode());
@@ -193,20 +204,18 @@ public class ResourceRepository implements IResourceRepository<Resource> {
 
   @Override
   public void deleteAllById(Iterable<? extends String> ids) {
-    // TODO Auto-generated method stub
+    throw new NotImplementedException();
 
   }
 
   @Override
   public void deleteAll(Iterable<? extends Resource> entities) {
-    // TODO Auto-generated method stub
-
+    throw new NotImplementedException();
   }
 
   @Override
   public void deleteAll() {
-    // TODO Auto-generated method stub
-
+    throw new NotImplementedException();
   }
 
 
@@ -225,11 +234,13 @@ public class ResourceRepository implements IResourceRepository<Resource> {
 
     InputStream triplesIStream = IOUtils.toInputStream(sparql, "utf-8");
 
+    String txid = fedroaPlatformTransactionManager.getTransactionId();
     
     try (
       final FcrepoClient client = FcrepoClient.client().build();
       FcrepoResponse response = new PatchBuilder(uri, client)
         .body(triplesIStream,"application/sparql-update")
+        .addHeader("Atomic-ID", txid)
         .perform()
     ) {
 
