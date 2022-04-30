@@ -168,7 +168,7 @@ public class FedroaPlatformTransactionManager extends AbstractPlatformTransactio
   /**
    * Returns currently active transaction from FedoraTransactionManager instance.
    * @return {String} transaction id of currently running transaction.
-   * @throws TransactionSystemException
+   * @throws TransactionSystemException if transaction id is null or empty string. 
    */
   public String getTransactionId() throws TransactionSystemException {
     if ((this.txid == null) || (this.txid == "")){
