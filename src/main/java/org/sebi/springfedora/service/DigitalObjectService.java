@@ -62,11 +62,7 @@ public class DigitalObjectService implements IDigitalObjectService {
     this.doResourceMapper = doResourceMapper;
   }
 
-  @Override
-  public DigitalObject createDigitalObjectByPid(String pid) throws ResourceRepositoryException {
-    return this.createDigitalObjectByPid(pid, null);
-  }
-
+  @Transactional
   @Override
   public DigitalObject createDigitalObjectByPid(String pid, @Nullable String rdf) throws ResourceRepositoryException {
     
