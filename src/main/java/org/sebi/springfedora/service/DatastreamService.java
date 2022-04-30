@@ -40,6 +40,7 @@ public class DatastreamService implements IDatastreamService  {
     throw new NotImplementedException("Method not implemented");
   }
   
+  @Transactional
   @Override
   public void deleteByDsid(String pid, String dsid) {
     String path = doResourceMapper.mapObjectResourcePath(pid) + "/datastream/" + dsid;
