@@ -3,6 +3,7 @@ package org.sebi.springfedora.service;
 import java.util.Arrays;
 import java.util.List;
 
+import org.apache.commons.lang3.NotImplementedException;
 import org.sebi.springfedora.model.Resource;
 import org.sebi.springfedora.repository.IResourceRepository;
 import org.springframework.stereotype.Service;
@@ -43,7 +44,13 @@ public class SetupService implements ISetupService {
       }
     });
 
-    
-
   }
+
+  @Override
+  public void createPrototypes() {
+    
+    throw new NotImplementedException("METHOD NOT IMPLEMENTED YET");
+    
+  }
+
 }

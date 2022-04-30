@@ -6,4 +6,9 @@ public interface ISetupService {
      * Like creations of aggregations / objects etc. containers
      */
     public void createBaseResources();
+
+    /**
+     * Creates prototype digital objects for GAMS
+     */
+    public void createPrototypes();
 }
