@@ -167,62 +167,6 @@ public class DigitalObjectService implements IDigitalObjectService {
 
   }
 
-  @Override
-  public DigitalObject createFromPrototypeByPid(String pid, String protoPid) throws ResourceRepositoryException {
-
-    DigitalObject prototype = this.findDigitalObjectByPid(protoPid);
-
-
-    // replace pid in rdf
-    String clonedRdf = prototype.getRdfXml();
-    String mappedDOPath = doResourceMapper.mapObjectResourcePath(pid);
-
-    log.info("Request against protoype {} succesfully for creation of object with pid {}", protoPid, mappedDOPath);
-    
-    /**
-     * From here processing + building of xml based RDF.
-     * (remove system triples)
-     */
-    try {
-      FedoraMetadata newMetadata = new FedoraMetadata(clonedRdf)
-        .removeFedoraSystemTriples()
-        .replaceResourcePath(mappedDOPath);
-
-      String newRdf = newMetadata.serializeToString();
-      return this.createDigitalObjectByPid(pid, newRdf);
-
-    } catch(SAXException | IOException | ParserConfigurationException e){
-      String msg = String.format("Failed to process xml from prototype %s for digital object %s. Starting from prototype rdf metadata: %s", protoPid, pid, clonedRdf);
-      log.error(msg + "\n" + e);
-      throw new ResourceRepositoryException(HttpStatus.INTERNAL_SERVER_ERROR.value(), msg);
-    }
-    
-  }
-
-
-  @Override
-  public DigitalObject createFromPrototypeByModel(String pid, String contentModel){
-
-    String protoPid = "";
-
-    switch(contentModel.toUpperCase()){
-      case "TEI":
-        protoPid = "o:prototype.tei";
-        break;
-      case "GML":
-        protoPid = "o:prototype.gml";
-        break;
-      default:
-        String msg = String.format("Found no prototype for given content model %s (should be no pid!). Tried to create object for pid: %s", contentModel, pid);
-        log.error(msg);
-        throw new ResourceRepositoryException(HttpStatus.UNPROCESSABLE_ENTITY.value(), msg);
-    }
-
-    return this.createFromPrototypeByPid(pid, protoPid);
-
-
-  }
-
   @Transactional(rollbackFor = Exception.class)
   public DigitalObject createTrans(String pid) throws ResourceRepositoryException {
 
