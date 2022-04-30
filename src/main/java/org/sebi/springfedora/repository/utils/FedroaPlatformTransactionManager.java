@@ -171,8 +171,8 @@ public class FedroaPlatformTransactionManager extends AbstractPlatformTransactio
    * @throws TransactionSystemException
    */
   public String getTransactionId() throws TransactionSystemException {
-    if (this.txid == null){
-      String msg = String.format("Transaction id (txid) is null but getTransactionId was called.");
+    if ((this.txid == null) || (this.txid == "")){
+      String msg = String.format("Demanded INVALID transaction id. Transaction id (txid) is null or '' but was demanded for fedora http operation");
       log.error(msg);
       throw new TransactionSystemException(msg);
     }
