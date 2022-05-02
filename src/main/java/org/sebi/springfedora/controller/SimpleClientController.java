@@ -2,6 +2,12 @@ package org.sebi.springfedora.controller;
 
 import java.io.IOException;
 
+import javax.validation.Valid;
+import javax.validation.constraints.Max;
+import javax.validation.constraints.Null;
+import javax.validation.constraints.Pattern;
+
+import org.sebi.springfedora.Common;
 import org.sebi.springfedora.exception.ResourceRepositoryException;
 import org.sebi.springfedora.model.Datastream;
 import org.sebi.springfedora.model.DigitalObject;
@@ -9,9 +15,11 @@ import org.sebi.springfedora.model.Resource;
 import org.sebi.springfedora.service.ContentModelService;
 import org.sebi.springfedora.service.IDatastreamService;
 import org.sebi.springfedora.service.IDigitalObjectService;
+import org.sebi.springfedora.utils.ValidationCommon;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.util.MimeType;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -24,6 +32,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 @RequestMapping("/client/")
 @Controller
+@Validated
 public class SimpleClientController {
 
   IDigitalObjectService digitalObjectService;
@@ -59,7 +68,8 @@ public class SimpleClientController {
   }
 
   @PostMapping("/createObject")
-  public String postObject(@RequestParam String pid, Model model){
+  @Validated
+  public String postObject( @RequestParam @Pattern(regexp = ValidationCommon.VALID_PID_REGEX, message = ValidationCommon.INVALID_PID_MESSAGE) String pid, Model model){
 
     DigitalObject digitalObject = digitalObjectService.createDigitalObjectByPid(pid, null);
     model.addAttribute("do", digitalObject);
@@ -78,7 +88,7 @@ public class SimpleClientController {
   }
 
   @PostMapping("/createDatastream")
-  public String createDatastream(@RequestParam String pid, @RequestParam String dsid, @RequestParam MultipartFile file, Model model) throws IOException {
+  public String createDatastream(@RequestParam @Pattern(regexp = ValidationCommon.VALID_PID_REGEX, message = ValidationCommon.INVALID_PID_MESSAGE) String pid, @RequestParam String dsid, @RequestParam MultipartFile file, Model model) throws IOException {
 
     byte[] fileAsBytes = file.getBytes();
     String mimetype = file.getContentType();
@@ -107,7 +117,7 @@ public class SimpleClientController {
   } 
 
   @PostMapping("/createObjectFromPrototype")
-  public String createObjectFromPrototype(@RequestParam String pid, @RequestParam String contentModel){
+  public String createObjectFromPrototype(@RequestParam @Pattern(regexp = ValidationCommon.VALID_PID_REGEX, message = ValidationCommon.INVALID_PID_MESSAGE) String pid, @RequestParam String contentModel){
     DigitalObject digitalObject = contentModelService.createFromPrototypeByModel(pid, contentModel);
     return "redirect:/client/" + digitalObject.getPid();
   }
