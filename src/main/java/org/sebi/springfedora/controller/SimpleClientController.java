@@ -88,7 +88,12 @@ public class SimpleClientController {
   }
 
   @PostMapping("/createDatastream")
-  public String createDatastream(@RequestParam @Pattern(regexp = ValidationCommon.VALID_PID_REGEX, message = ValidationCommon.INVALID_PID_MESSAGE) String pid, @RequestParam String dsid, @RequestParam MultipartFile file, Model model) throws IOException {
+  public String createDatastream(
+    @RequestParam @Pattern(regexp = ValidationCommon.VALID_PID_REGEX, message = ValidationCommon.INVALID_PID_MESSAGE) String pid, 
+    @RequestParam @Pattern(regexp = ValidationCommon.VALID_DATASTREAM_ID, message = ValidationCommon.INVALID_DATASTREAM_ID_MESSAGE) String dsid, 
+    @RequestParam MultipartFile file, 
+    Model model
+  ) throws IOException {
 
     byte[] fileAsBytes = file.getBytes();
     String mimetype = file.getContentType();
