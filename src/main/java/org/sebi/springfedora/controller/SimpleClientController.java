@@ -69,8 +69,10 @@ public class SimpleClientController {
 
   @PostMapping("/createObject")
   @Validated
-  public String postObject( @RequestParam @Pattern(regexp = ValidationCommon.VALID_PID_REGEX, message = ValidationCommon.INVALID_PID_MESSAGE) String pid, Model model){
-
+  public String postObject( 
+    @RequestParam @Pattern(regexp = ValidationCommon.VALID_PID_REGEX, message = ValidationCommon.INVALID_PID_MESSAGE) String pid, 
+    Model model
+  ){
     DigitalObject digitalObject = digitalObjectService.createDigitalObjectByPid(pid, null);
     model.addAttribute("do", digitalObject);
     return "redirect:/client/" + digitalObject.getPid();
@@ -122,7 +124,10 @@ public class SimpleClientController {
   } 
 
   @PostMapping("/createObjectFromPrototype")
-  public String createObjectFromPrototype(@RequestParam @Pattern(regexp = ValidationCommon.VALID_PID_REGEX, message = ValidationCommon.INVALID_PID_MESSAGE) String pid, @RequestParam String contentModel){
+  public String createObjectFromPrototype(
+    @RequestParam @Pattern(regexp = ValidationCommon.VALID_PID_REGEX, message = ValidationCommon.INVALID_PID_MESSAGE) String pid, 
+    @RequestParam String contentModel
+  ){
     DigitalObject digitalObject = contentModelService.createFromPrototypeByModel(pid, contentModel);
     return "redirect:/client/" + digitalObject.getPid();
   }
