@@ -45,9 +45,9 @@ public class SimpleDOController {
    * @return
    */
   @GetMapping("{pid}")
-  public DigitalObject getDO(@PathVariable("pid") @Pattern(regexp = ValidationCommon.VALID_PID_REGEX) String pid) throws ResourceRepositoryException {
+  public DigitalObject getDO(@Valid DigitalObject digitalObject) throws ResourceRepositoryException {
     
-	  return this.digitalObjectService.findDigitalObjectByPid(pid);
+	  return this.digitalObjectService.findDigitalObjectByPid(digitalObject.getPid());
     // return pid;
   }
 
