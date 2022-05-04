@@ -1,12 +1,18 @@
 package org.sebi.springfedora.model;
 
+import javax.validation.constraints.NotBlank;
+
 import org.springframework.util.MimeType;
 
 public class Datastream extends Resource {
+
   //private String dsId; 
+  
+  @NotBlank
   private byte[] content;
 
   // mimetype of datastream
+  @NotBlank
   private MimeType mimeType;
 
   public Datastream(String path, String rdfXml, MimeType mimeType, byte[] content){
