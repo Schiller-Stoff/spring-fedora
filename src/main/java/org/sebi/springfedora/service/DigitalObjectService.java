@@ -60,7 +60,6 @@ public class DigitalObjectService implements IDigitalObjectService {
 
   @Override
   public DigitalObject findDigitalObjectByPid(String pid) throws ResourceRepositoryException {
-    // TODO Auto-generated method stub
 
     // repository layer: request against fedora
     // getting the Resource

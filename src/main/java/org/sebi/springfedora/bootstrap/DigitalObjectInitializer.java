@@ -8,7 +8,6 @@ import java.util.List;
 import org.apache.commons.io.FileUtils;
 import org.sebi.springfedora.Common;
 import org.sebi.springfedora.exception.ResourceRepositoryException;
-import org.sebi.springfedora.repository.IResourceRepository;
 import org.sebi.springfedora.service.IDatastreamService;
 import org.sebi.springfedora.service.IDigitalObjectService;
 import org.sebi.springfedora.service.ISetupService;
@@ -23,13 +22,11 @@ import lombok.extern.slf4j.Slf4j;
 public class DigitalObjectInitializer implements CommandLineRunner {
 
   private final IDigitalObjectService DOService;
-  private final IResourceRepository resourceRepository;
   private final IDatastreamService datastreamService;
   private final ISetupService setupService;
 
-  public DigitalObjectInitializer(IDigitalObjectService DOService, IResourceRepository resourceRepository, IDatastreamService datastreamService, ISetupService setupService) {
+  public DigitalObjectInitializer(IDigitalObjectService DOService, IDatastreamService datastreamService, ISetupService setupService) {
     this.DOService = DOService;
-    this.resourceRepository = resourceRepository;
     this.datastreamService = datastreamService;
     this.setupService = setupService;
   }
@@ -124,14 +121,6 @@ public class DigitalObjectInitializer implements CommandLineRunner {
 
   }
 
-  private void createDigitalObject(String pid, String rdfXml){
-    try {
-      this.DOService.createDigitalObjectByPid(pid, rdfXml);
-    } catch ( ResourceRepositoryException e){
-      //skip already existing
-    }
-  }
-
   private void createDigitalObject(String pid){
     try {
       this.DOService.createDigitalObjectByPid(pid, null);
@@ -153,7 +142,6 @@ public class DigitalObjectInitializer implements CommandLineRunner {
       byte[] content = FileUtils.readFileToByteArray(new File(filePath));
       this.createDatastream(dsid, mimetype, pid, content);
     } catch (IOException e) {
-      // TODO Auto-generated catch block
       e.printStackTrace();
     }
   }
