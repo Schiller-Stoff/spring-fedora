@@ -3,22 +3,12 @@ package org.sebi.springfedora.controller;
 import java.net.URISyntaxException;
 
 import javax.validation.Valid;
-import javax.validation.constraints.AssertFalse;
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.Null;
-import javax.validation.constraints.Pattern;
 
-import org.fcrepo.client.FcrepoOperationFailedException;
 import org.sebi.springfedora.Common;
-import org.sebi.springfedora.exception.ResourceNotFoundException;
 import org.sebi.springfedora.exception.ResourceRepositoryException;
 import org.sebi.springfedora.model.DigitalObject;
-import org.sebi.springfedora.repository.DigitalObject.IDigitalObjectRepository;
 import org.sebi.springfedora.service.ContentModelService;
 import org.sebi.springfedora.service.IDigitalObjectService;
-import org.sebi.springfedora.service.utils.ContentModelUtils;
-import org.sebi.springfedora.utils.ValidationCommon;
-import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;

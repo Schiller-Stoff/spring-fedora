@@ -9,22 +9,18 @@ import java.util.Optional;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.NotImplementedException;
 import org.fcrepo.client.FcrepoClient;
-import org.fcrepo.client.FcrepoLink;
 import org.fcrepo.client.FcrepoOperationFailedException;
 import org.fcrepo.client.FcrepoResponse;
 import org.fcrepo.client.GetBuilder;
-import org.fcrepo.client.PostBuilder;
 import org.fcrepo.client.PutBuilder;
 import org.sebi.springfedora.exception.ResourceRepositoryException;
 import org.sebi.springfedora.model.Datastream;
-import org.sebi.springfedora.model.Resource;
 import org.sebi.springfedora.repository.ResourceRepository;
 import org.sebi.springfedora.repository.utils.FedroaPlatformTransactionManager;
 import org.sebi.springfedora.repository.utils.RepositoryUtils;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.PlatformTransactionManager;
-import org.springframework.transaction.TransactionSystemException;
 import org.springframework.util.MimeType;
 
 import lombok.extern.slf4j.Slf4j;
@@ -189,7 +185,7 @@ public class DatastreamRepository implements IDatastreamRepository {
 
   @Override
   public void deleteAll() {
-    // TODO Auto-generated method stub
+    throw new NotImplementedException();
     
   }
   

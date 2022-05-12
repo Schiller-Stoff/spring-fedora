@@ -1,11 +1,7 @@
 package org.sebi.springfedora.service;
 
-import java.net.URISyntaxException;
-
-import org.fcrepo.client.FcrepoOperationFailedException;
 import org.sebi.springfedora.exception.ResourceRepositoryException;
 import org.sebi.springfedora.model.DigitalObject;
-import org.springframework.data.rest.webmvc.ResourceNotFoundException;
 
 public interface IDigitalObjectService {
   

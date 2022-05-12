@@ -3,7 +3,6 @@ package org.sebi.springfedora.repository;
 import java.io.IOException;
 import java.net.URI;
 
-import org.fcrepo.client.FcrepoOperationFailedException;
 import org.fcrepo.client.FcrepoResponse;
 import org.sebi.springfedora.exception.ResourceRepositoryException;
 import org.sebi.springfedora.model.Resource;

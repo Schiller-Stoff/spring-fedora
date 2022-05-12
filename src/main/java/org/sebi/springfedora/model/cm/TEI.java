@@ -7,7 +7,6 @@ public class TEI extends DigitalObject {
 
   public TEI(String pid, Resource resource) {
     super(pid, "", "");
-    //TODO Auto-generated constructor stub
   }
   
 }

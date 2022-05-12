@@ -377,7 +377,6 @@ public class Common {
      response.setStatus(HttpServletResponse.SC_SERVICE_UNAVAILABLE);
      response.flushBuffer();
    } catch (Exception e) {
-     //TODO log
    }
  }
 

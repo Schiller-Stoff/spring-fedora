@@ -6,8 +6,6 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Optional;
 
-import javax.xml.parsers.ParserConfigurationException;
-
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.NotImplementedException;
 import org.fcrepo.client.DeleteBuilder;
@@ -24,8 +22,6 @@ import org.sebi.springfedora.repository.utils.RepositoryUtils;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.PlatformTransactionManager;
-import org.springframework.util.MimeType;
-import org.xml.sax.SAXException;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -44,7 +40,6 @@ public class ResourceRepository implements IResourceRepository<Resource> {
 
     URI uri = retrieveResourceURI(resource);
 
-    // TODO add more
     // POST given resource to Fedora
     // String rdf = resource.getRdfXml();
 
