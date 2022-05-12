@@ -29,17 +29,17 @@ There are additional __optional requirements__ (dependent on used spring profile
 2. Launch spring boot app afterwards
 
 
-## Staging setup
+# Staging setup
 
 - includes all features not required for direct production setup (like for providing stable links via handle etc.)
 
 
-### Requirements
+## Requirements
 
-#### 0. Fedora 6.1
+### 0. Fedora 6.1
 - running on port 8082
 
-#### 1. Keycloak
+### 1. Keycloak
 
 - running on port 8182
 - (thymeleaf web client uses the authorization-code-flow to protect server based web clients)
